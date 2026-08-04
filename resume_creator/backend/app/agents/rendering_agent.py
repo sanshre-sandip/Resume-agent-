@@ -6,6 +6,33 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
+_TEX_SPECIAL_CHARS = {
+    "\\": r"\textbackslash{}",
+    "&": r"\&",
+    "%": r"\%",
+    "$": r"\$",
+    "#": r"\#",
+    "_": r"\_",
+    "{": r"\{",
+    "}": r"\}",
+    "~": r"\textasciitilde{}",
+    "^": r"\textasciicircum{}",
+}
+
+
+def tex_escape(value: str) -> str:
+    return "".join(_TEX_SPECIAL_CHARS.get(ch, ch) for ch in value)
+
+
+def _escape_context(value: Any) -> Any:
+    if isinstance(value, str):
+        return tex_escape(value)
+    if isinstance(value, dict):
+        return {k: _escape_context(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_escape_context(v) for v in value]
+    return value
+
 
 class LaTeXRenderer:
     def __init__(self, template_dir: str) -> None:
@@ -31,7 +58,7 @@ class LaTeXRenderer:
     def render(self, template_name: str, context: dict[str, Any]) -> str:
         safe_name = f"{template_name}.tex" if not template_name.endswith(".tex") else template_name
         template = self.env.get_template(safe_name)
-        return template.render(**context)
+        return template.render(**_escape_context(context))
 
 
 def render_latex(template_name: str, context: dict[str, Any], template_dir: str) -> str:

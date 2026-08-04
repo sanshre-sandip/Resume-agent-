@@ -17,12 +17,15 @@ def compile_pdflatex(tex_path: str, output_dir: str) -> str | None:
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
         logger.info("pdflatex rc=%s", proc.returncode)
-        if proc.returncode != 0:
-            logger.warning("pdflatex stderr: %s", proc.stderr[-800:])
-            return None
         pdf_name = Path(tex_path).with_suffix(".pdf").name
         out = str(Path(output_dir) / pdf_name)
-        return out if Path(out).exists() else None
+        if not Path(out).exists():
+            if proc.returncode != 0:
+                logger.warning("pdflatex failed, stdout tail: %s", proc.stdout[-800:])
+            return None
+        if proc.returncode != 0:
+            logger.warning("pdflatex exited %s but produced a PDF; stdout tail: %s", proc.returncode, proc.stdout[-800:])
+        return out
     except FileNotFoundError:
         logger.error("pdflatex not found in PATH; install TeX Live or teTeX")
         return None
