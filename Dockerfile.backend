@@ -1,0 +1,23 @@
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    texlive-latex-base \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
+    pandoc \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY resume_creator/ ./resume_creator/
+
+RUN mkdir -p resume_creator/uploads resume_creator/generated resume_creator/logs
+
+EXPOSE 8001
+
+CMD ["uvicorn", "resume_creator.backend.app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+

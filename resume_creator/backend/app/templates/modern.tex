@@ -1,0 +1,68 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1.8cm]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+
+\definecolor{accent}{HTML}{1F6FEB}
+
+\setlist[itemize]{leftmargin=1.2em,topsep=2pt,itemsep=1pt}
+\titleformat{\section}{\large\bfseries\color{accent}}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{10pt}{4pt}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+{\Huge\bfseries \VAR{header.full_name}}\\[2pt]
+\BLOCK{ if header.title }{\large\color{accent}\VAR{header.title}}\\[4pt]\BLOCK{ endif }
+\small
+\VAR{header.email}\BLOCK{ if header.phone } \textbar{} \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.address } \textbar{} \VAR{header.address}\BLOCK{ endif }\\
+\BLOCK{ if header.linkedin }\href{\VAR{header.linkedin}}{LinkedIn}\BLOCK{ endif }\BLOCK{ if header.github } \textbar{} \href{\VAR{header.github}}{GitHub}\BLOCK{ endif }\BLOCK{ if header.portfolio } \textbar{} \href{\VAR{header.portfolio}}{Portfolio}\BLOCK{ endif }
+
+\BLOCK{ if summary }
+\section{Summary}
+\VAR{summary}
+\BLOCK{ endif }
+
+\BLOCK{ if experience }
+\section{Experience}
+\BLOCK{ for item in experience }
+\textbf{\VAR{item.role}} \hfill \VAR{item.duration}\\
+\textit{\VAR{item.company}}\\
+\VAR{item.description}\\[4pt]
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\BLOCK{ if projects }
+\section{Projects}
+\BLOCK{ for item in projects }
+\textbf{\VAR{item.name}}\BLOCK{ if item.technologies } \textemdash{} \textit{\VAR{item.technologies}}\BLOCK{ endif }\\
+\VAR{item.description}\\[4pt]
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\BLOCK{ if education }
+\section{Education}
+\BLOCK{ for item in education }
+\textbf{\VAR{item.degree}} \hfill \VAR{item.graduation_year}\\
+\textit{\VAR{item.institution}}\\[4pt]
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\BLOCK{ if skills_line }
+\section{Skills}
+\VAR{skills_line}
+\BLOCK{ endif }
+
+\BLOCK{ if certificates }
+\section{Certifications}
+\begin{itemize}
+\BLOCK{ for item in certificates }
+\item \VAR{item.name}\BLOCK{ if item.issuer } \textemdash{} \VAR{item.issuer}\BLOCK{ endif }
+\BLOCK{ endfor }
+\end{itemize}
+\BLOCK{ endif }
+
+\end{document}

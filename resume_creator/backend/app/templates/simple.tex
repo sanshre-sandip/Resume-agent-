@@ -1,0 +1,59 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\setlist[itemize]{leftmargin=1.2em,topsep=2pt,itemsep=1pt}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+\newcommand{\rsection}[1]{\bigskip{\large\bfseries #1}\par\hrule\smallskip}
+
+\begin{document}
+
+{\LARGE\bfseries \VAR{header.full_name}}\par
+\BLOCK{ if header.title }\VAR{header.title}\par\BLOCK{ endif }
+\VAR{header.email}\BLOCK{ if header.phone } | \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.address } | \VAR{header.address}\BLOCK{ endif }\par
+
+\BLOCK{ if summary }
+\rsection{Summary}
+\VAR{summary}\par
+\BLOCK{ endif }
+
+\BLOCK{ if experience }
+\rsection{Experience}
+\BLOCK{ for item in experience }
+\textbf{\VAR{item.role}}, \VAR{item.company} \hfill \VAR{item.duration}\par
+\VAR{item.description}\par\smallskip
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\BLOCK{ if projects }
+\rsection{Projects}
+\BLOCK{ for item in projects }
+\textbf{\VAR{item.name}}: \VAR{item.description}\par\smallskip
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\BLOCK{ if education }
+\rsection{Education}
+\BLOCK{ for item in education }
+\VAR{item.degree}, \VAR{item.institution} \hfill \VAR{item.graduation_year}\par
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\BLOCK{ if skills_line }
+\rsection{Skills}
+\VAR{skills_line}\par
+\BLOCK{ endif }
+
+\BLOCK{ if certificates }
+\rsection{Certifications}
+\begin{itemize}
+\BLOCK{ for item in certificates }
+\item \VAR{item.name}\BLOCK{ if item.issuer } -- \VAR{item.issuer}\BLOCK{ endif }
+\BLOCK{ endfor }
+\end{itemize}
+\BLOCK{ endif }
+
+\end{document}

@@ -1,0 +1,66 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+\setlist[itemize]{leftmargin=1.3em,topsep=2pt,itemsep=1pt}
+\titleformat{\section}{\bfseries\uppercase}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{12pt}{4pt}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries \VAR{header.full_name}}\\[2pt]
+\BLOCK{ if header.title }\VAR{header.title}\\[2pt]\BLOCK{ endif }
+\small \VAR{header.email}\BLOCK{ if header.phone } $\cdot$ \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.address } $\cdot$ \VAR{header.address}\BLOCK{ endif }\\
+\BLOCK{ if header.linkedin }\href{\VAR{header.linkedin}}{LinkedIn}\BLOCK{ endif }\BLOCK{ if header.github } $\cdot$ \href{\VAR{header.github}}{GitHub}\BLOCK{ endif }\BLOCK{ if header.portfolio } $\cdot$ \href{\VAR{header.portfolio}}{Portfolio}\BLOCK{ endif }
+\end{center}
+
+\BLOCK{ if summary }
+\section{Professional Summary}
+\VAR{summary}
+\BLOCK{ endif }
+
+\BLOCK{ if experience }
+\section{Professional Experience}
+\BLOCK{ for item in experience }
+\textbf{\VAR{item.company}} \hfill \VAR{item.duration}\\
+\textit{\VAR{item.role}}\\
+\VAR{item.description}\\[4pt]
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\BLOCK{ if projects }
+\section{Projects}
+\BLOCK{ for item in projects }
+\textbf{\VAR{item.name}}\BLOCK{ if item.technologies } (\VAR{item.technologies})\BLOCK{ endif }\\
+\VAR{item.description}\\[4pt]
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\BLOCK{ if education }
+\section{Education}
+\BLOCK{ for item in education }
+\textbf{\VAR{item.institution}} \hfill \VAR{item.graduation_year}\\
+\VAR{item.degree}\\[4pt]
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\BLOCK{ if skills_line }
+\section{Skills}
+\VAR{skills_line}
+\BLOCK{ endif }
+
+\BLOCK{ if certificates }
+\section{Certifications}
+\begin{itemize}
+\BLOCK{ for item in certificates }
+\item \VAR{item.name}\BLOCK{ if item.issuer }, \VAR{item.issuer}\BLOCK{ endif }
+\BLOCK{ endfor }
+\end{itemize}
+\BLOCK{ endif }
+
+\end{document}

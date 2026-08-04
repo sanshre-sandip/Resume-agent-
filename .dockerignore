@@ -1,0 +1,13 @@
+res/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+.git/
+.gitignore
+resume_creator/uploads/*
+resume_creator/generated/*
+resume_creator/logs/*
+*.egg-info/
+.pytest_cache/

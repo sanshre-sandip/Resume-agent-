@@ -1,0 +1,228 @@
+# AI Resume Creator
+
+Production-ready AI-powered resume generation platform built with FastAPI, LangGraph, LangChain, SQLAlchemy, PostgreSQL, and Streamlit.
+
+## Architecture
+
+Streamlit UI -> FastAPI -> LangGraph Workflow -> PostgreSQL Database
+
+### LangGraph Nodes
+1. User Profile Validation
+2. Job Research
+3. Resume Optimization
+4. Resume Structuring
+5. LaTeX Rendering
+6. Export (PDF/DOCX)
+
+### Data Flow Diagram
+
+```mermaid
+flowchart TD
+    subgraph Frontend["Streamlit Frontend"]
+        FORM[User Form Fields]
+        SUBMIT[POST /api/resume/create]
+    end
+
+    subgraph FastAPI["FastAPI Backend"]
+        ROUTER[Router<br/>resumes.py]
+        VALIDATE[Pydantic Validation<br/>CreateResumeRequest]
+    end
+
+    subgraph Graph["LangGraph Workflow"]
+        N1[Node 1: Validate<br/>validate_node]
+        N2[Node 2: Research<br/>research_node]
+        N3[Node 3: Optimize<br/>optimize_node]
+        N4[Node 4: Structure<br/>structure_node]
+        N5[Node 5: Render<br/>render_node]
+        N6[Node 6: Export<br/>export_node]
+    end
+
+    subgraph Agents["Agent Layer"]
+        RA[Research Agent]
+        OA[Optimization Agent]
+        SA[Structuring Agent]
+        RDA[LaTeX Renderer]
+        EA[Export Agent]
+    end
+
+    subgraph LLM["LLM Providers"]
+        LLMF[llm_providers.py<br/>OpenAI | Anthropic | Google | Ollama | OpenRouter]
+    end
+
+    subgraph Services["Services"]
+        RS[Research Service]
+        RSCache[(ResearchCache<br/>DB Table)]
+    end
+
+    subgraph Storage["Storage"]
+        DB[(PostgreSQL Database<br/>users, resumes)]
+        TEX[.tex Template]
+        FS[Generated Files<br/>.tex / .pdf / .docx]
+    end
+
+    subgraph Response["Response"]
+        OUT[ResumeDetailResponse<br/>structured_data, latex, pdf, docx]
+        DL[Download Buttons<br/>Streamlit UI]
+    end
+
+    FORM --> SUBMIT --> ROUTER
+    ROUTER --> VALIDATE
+    ROUTER --> DB
+    VALIDATE --> N1 --> N2 --> N3 --> N4 --> N5 --> N6
+
+    N2 --> RA --> LLMF
+    N2 --> RS --> RSCache
+
+    N3 --> OA --> LLMF
+    N4 --> SA --> LLMF
+    N5 --> RDA --> TEX
+    N6 --> EA --> FS
+
+    N6 --> ROUTER
+    ROUTER --> DB
+    ROUTER --> OUT --> DL
+```
+
+## Project Structure
+
+```
+resume_creator/
+├── backend/
+│   └── app/
+│       ├── main.py              # FastAPI application
+│       ├── config.py            # Settings and environment configuration
+│       ├── database/
+│       │   ├── models.py        # SQLAlchemy ORM models
+│       │   └── session.py       # DB session factory
+│       ├── schemas/
+│       │   └── schemas.py       # Pydantic request/response schemas
+│       ├── routers/
+│       │   ├── resumes.py       # Resume endpoints
+│       │   └── research.py      # Research endpoints
+│       ├── agents/
+│       │   ├── research_agent.py
+│       │   ├── optimization_agent.py
+│       │   ├── structuring_agent.py
+│       │   ├── rendering_agent.py
+│       │   └── export_agent.py
+│       ├── graph/
+│       │   └── resume_graph.py  # LangGraph workflow
+│       ├── services/
+│       │   ├── research_service.py
+│       │   └── resume_service.py
+│       ├── templates/           # LaTeX templates (*.tex)
+│       └── utils/
+│           ├── llm_providers.py # OpenAI, Anthropic, Google, Ollama, OpenRouter
+│           ├── renderer.py
+│           └── latex_utils.py
+├── frontend/
+│   └── streamlit_app.py         # Streamlit UI
+├── generated/                   # Generated PDFs and DOCX
+├── uploads/                     # User uploads
+└── logs/                        # Application logs
+```
+
+## Prerequisites
+
+- Python 3.11+
+- PostgreSQL 16.x
+- Ollama (for local LLM) or API keys for OpenAI/Anthropic/Google/OpenRouter
+- TeX Live (for PDF generation) or pandoc (for DOCX conversion)
+
+## Setup
+
+1. Clone the repository and navigate to the project directory:
+```bash
+cd /home/sandip/Resume_Agent
+```
+
+2. Create a virtual environment:
+```bash
+python3 -m venv res
+source res/bin/activate
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+4. Configure environment:
+```bash
+cp .env.example .env
+# Edit .env with your database and LLM credentials
+```
+
+5. Initialize the database:
+```bash
+# Create the database
+psql -U postgres -c "CREATE DATABASE resume_db;"
+
+# Run migrations (if using Alembic)
+alembic upgrade head
+```
+
+6. Create required directories:
+```bash
+mkdir -p generated uploads logs
+```
+
+## Running the Application
+
+### Start the FastAPI Backend
+
+```bash
+uvicorn resume_creator.backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+### Start the Streamlit Frontend
+
+```bash
+streamlit run resume_creator/frontend/streamlit_app.py
+```
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/resume/create` | Create a new resume |
+| GET | `/api/resume/{id}` | Get resume details |
+| GET | `/api/resume/{id}/pdf` | Download PDF |
+| GET | `/api/resume/{id}/docx` | Download DOCX |
+| GET | `/api/templates` | List available templates |
+| GET | `/api/history` | Get resume history |
+| GET | `/api/research/{role}` | Research job market |
+
+## LLM Providers
+
+Supported providers (configure in `.env`):
+- **Ollama** (default, local)
+- **OpenAI** (GPT-4o)
+- **Anthropic** (Claude)
+- **Google** (Gemini)
+- **OpenRouter**
+
+## LaTeX Templates
+
+Place `.tex` templates in `resume_creator/backend/app/templates/`:
+- `modern.tex`
+- `professional.tex`
+- `simple.tex`
+
+## Environment Variables
+
+See `.env.example` for all available configuration options.
+
+## Tech Stack
+
+- **Frontend**: Streamlit
+- **Backend**: FastAPI
+- **Agent Framework**: LangChain, LangGraph
+- **Database**: PostgreSQL with SQLAlchemy ORM
+- **LLM**: Provider abstraction (OpenAI, Gemini, Claude, Ollama, OpenRouter)
+- **Rendering**: Jinja2, LaTeX, pdflatex, Pandoc
+- **Storage**: Local filesystem (S3-ready)
+
+## License
+
+MIT
