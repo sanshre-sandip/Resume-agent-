@@ -8,7 +8,7 @@ Web UI -> FastAPI -> LangGraph Workflow -> Local JSON files
 
 ### LangGraph Nodes
 1. User Profile Validation
-2. Job Research
+2. Role context retrieval for resume tailoring
 3. Resume Optimization
 4. Resume Structuring
 5. LaTeX Rendering
@@ -51,7 +51,7 @@ flowchart TD
 
     subgraph Services["Services"]
         RS[Research Service]
-        RSCache[(ResearchCache<br/>DB Table)]
+        RSCache[(Local JSON cache)]
     end
 
     subgraph Storage["Storage"]
@@ -97,7 +97,6 @@ resume_creator/
 │       │   └── schemas.py       # Pydantic request/response schemas
 │       ├── routers/
 │       │   ├── resumes.py       # Resume endpoints
-│       │   └── research.py      # Research endpoints
 │       ├── agents/
 │       │   ├── research_agent.py
 │       │   ├── optimization_agent.py
@@ -204,7 +203,6 @@ See `.env.example` for all available configuration options.
 - **Storage**: Local JSON files in `data/`
 - **LLM**: Provider abstraction (OpenAI, Gemini, Claude, Ollama, OpenRouter)
 - **Rendering**: Jinja2, LaTeX, pdflatex, Pandoc
-- **Storage**: Local filesystem (S3-ready)
 
 ## License
 

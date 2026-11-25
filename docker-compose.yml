@@ -1,57 +1,19 @@
 services:
-  postgres:
-    image: postgres:16
-    restart: unless-stopped
-    mem_limit: 512m
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mypassword123}
-      POSTGRES_DB: ${POSTGRES_DB:-resume_db}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  backend:
+  app:
     build:
       context: .
       dockerfile: Dockerfile.backend
     restart: unless-stopped
-    mem_limit: 768m
     env_file:
       - .env
     environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      DATABASE_URL: ""
+      DATA_DIR: /app/data
       OLLAMA_BASE_URL: http://host.docker.internal:11434
     ports:
       - "8001:8001"
     volumes:
-      - ./resume_creator/uploads:/app/resume_creator/uploads
+      - ./data:/app/data
       - ./resume_creator/generated:/app/resume_creator/generated
-      - ./resume_creator/logs:/app/resume_creator/logs
+      - ./resume_creator/uploads:/app/resume_creator/uploads
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    restart: on-failure:5
-    mem_limit: 512m
-    environment:
-      API_BASE_URL: http://backend:8001
-    ports:
-      - "8501:8501"
-    depends_on:
-      - backend
-
-volumes:
-  postgres_data:
