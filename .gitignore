@@ -39,6 +39,7 @@ ENV/
 uploads/
 generated/
 logs/
+data/
 resume_creator/uploads/
 resume_creator/generated/
 resume_creator/logs/

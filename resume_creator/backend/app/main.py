@@ -1,13 +1,13 @@
 import logging
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
 from .config import settings
 from .routers import resumes, research
-from .database.session import engine
-from .database.models import Base
 
 logger = logging.getLogger(__name__)
 
@@ -15,11 +15,6 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting AI Resume Creator API")
-    try:
-        Base.metadata.create_all(bind=engine)
-        logger.info("Database tables ensured")
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("Could not create database tables (DB may be unavailable): %s", exc)
     yield
     logger.info("Shutting down AI Resume Creator API")
 
@@ -40,6 +35,13 @@ def create_app() -> FastAPI:
     )
     app.include_router(resumes.router)
     app.include_router(research.router)
+
+    static_dir = Path(__file__).resolve().parents[2] / "frontend" / "static"
+    app.mount("/assets", StaticFiles(directory=static_dir), name="assets")
+
+    @app.get("/", include_in_schema=False)
+    def home():
+        return FileResponse(static_dir / "index.html")
 
     @app.get("/health")
     def health_check():

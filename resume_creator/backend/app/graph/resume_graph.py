@@ -15,8 +15,6 @@ from ..agents.optimization_agent import run_optimization_agent
 from ..agents.structuring_agent import run_structuring_agent
 from ..agents.rendering_agent import LaTeXRenderer
 from ..agents.export_agent import persist_artifacts
-from ..database.session import get_db
-from ..database.models import User, Resume
 from datetime import datetime
 import uuid
 

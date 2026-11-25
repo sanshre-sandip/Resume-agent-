@@ -14,13 +14,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    postgres_host: str = "localhost"
-    postgres_port: int = 5432
-    postgres_user: str = "postgres"
-    postgres_password: str = ""
-    postgres_db: str = "resume_db"
-
-    database_url: str = ""
     llm_provider: str = "ollama"
     openai_api_key: str = ""
     openai_base_url: str = "https://api.openai.com/v1"
@@ -40,12 +33,6 @@ class Settings(BaseSettings):
     template_dir: str = str(BASE_DIR / "backend" / "app" / "templates")
     cors_origins: str = "*"
     allowed_extensions: str = "pdf,png,jpg,jpeg"
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        if not self.database_url:
-            self.database_url = f"postgresql+psycopg2://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
-
 
 settings = Settings()
 for d in [settings.upload_dir, settings.generated_dir, settings.log_dir]:

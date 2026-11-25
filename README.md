@@ -1,10 +1,10 @@
 # AI Resume Creator
 
-Production-ready AI-powered resume generation platform built with FastAPI, LangGraph, LangChain, SQLAlchemy, PostgreSQL, and Streamlit.
+AI-powered resume generation platform built with FastAPI, LangGraph, LangChain, local JSON file storage, and Streamlit.
 
 ## Architecture
 
-Streamlit UI -> FastAPI -> LangGraph Workflow -> PostgreSQL Database
+Streamlit UI -> FastAPI -> LangGraph Workflow -> Local JSON files
 
 ### LangGraph Nodes
 1. User Profile Validation
@@ -55,7 +55,7 @@ flowchart TD
     end
 
     subgraph Storage["Storage"]
-        DB[(PostgreSQL Database<br/>users, resumes)]
+        DB[(JSON files<br/>users, resumes, research cache)]
         TEX[.tex Template]
         FS[Generated Files<br/>.tex / .pdf / .docx]
     end
@@ -92,8 +92,7 @@ resume_creator/
 │       ├── main.py              # FastAPI application
 │       ├── config.py            # Settings and environment configuration
 │       ├── database/
-│       │   ├── models.py        # SQLAlchemy ORM models
-│       │   └── session.py       # DB session factory
+│       │   └── file_store.py    # JSON file persistence
 │       ├── schemas/
 │       │   └── schemas.py       # Pydantic request/response schemas
 │       ├── routers/
@@ -125,7 +124,6 @@ resume_creator/
 ## Prerequisites
 
 - Python 3.11+
-- PostgreSQL 16.x
 - Ollama (for local LLM) or API keys for OpenAI/Anthropic/Google/OpenRouter
 - TeX Live (for PDF generation) or pandoc (for DOCX conversion)
 
@@ -150,19 +148,10 @@ pip install -r requirements.txt
 4. Configure environment:
 ```bash
 cp .env.example .env
-# Edit .env with your database and LLM credentials
+# Edit .env with your LLM credentials (DATA_DIR selects local JSON storage)
 ```
 
-5. Initialize the database:
-```bash
-# Create the database
-psql -U postgres -c "CREATE DATABASE resume_db;"
-
-# Run migrations (if using Alembic)
-alembic upgrade head
-```
-
-6. Create required directories:
+5. Create required directories:
 ```bash
 mkdir -p generated uploads logs
 ```
@@ -218,7 +207,7 @@ See `.env.example` for all available configuration options.
 - **Frontend**: Streamlit
 - **Backend**: FastAPI
 - **Agent Framework**: LangChain, LangGraph
-- **Database**: PostgreSQL with SQLAlchemy ORM
+- **Storage**: Local JSON files in `data/`
 - **LLM**: Provider abstraction (OpenAI, Gemini, Claude, Ollama, OpenRouter)
 - **Rendering**: Jinja2, LaTeX, pdflatex, Pandoc
 - **Storage**: Local filesystem (S3-ready)
