@@ -40,7 +40,7 @@ async def validate_node(state: ResumeState) -> ResumeState:
 
 async def research_node(state: ResumeState) -> ResumeState:
     role = state["input"]["target_role"]
-    llm = get_llm_provider(settings, state["input"]["ai_config"])
+    llm = get_llm_provider(state["input"]["ai_config"])
     data = await get_or_create_research(llm_provider=llm, role=role)
     state["research_data"] = data
     state.setdefault("logs", []).append("researched")
@@ -57,7 +57,7 @@ async def optimize_node(state: ResumeState) -> ResumeState:
         "skills": state["input"].get("skills", []),
         "target_role": state["input"]["target_role"],
     }
-    llm = get_llm_provider(settings, state["input"]["ai_config"])
+    llm = get_llm_provider(state["input"]["ai_config"])
     optimized = await run_optimization_agent(llm=llm, user_profile=profile, research_data=state["research_data"])
     state["optimized_resume"] = optimized
     state.setdefault("logs", []).append("optimized")
@@ -65,7 +65,7 @@ async def optimize_node(state: ResumeState) -> ResumeState:
 
 
 async def structure_node(state: ResumeState) -> ResumeState:
-    llm = get_llm_provider(settings, state["input"]["ai_config"])
+    llm = get_llm_provider(state["input"]["ai_config"])
     structured = await run_structuring_agent(llm=llm, optimized_resume=state.get("optimized_resume", {}), user_profile=state["payload"] or {})
     state["structured_data"] = structured
     state.setdefault("logs", []).append("structured")
