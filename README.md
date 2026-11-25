@@ -1,6 +1,6 @@
 # AI Resume Creator
 
-AI-powered resume generation platform built with FastAPI, LangGraph, LangChain, a responsive HTML/CSS/JavaScript interface, and local JSON file storage.
+AI-powered single-person resume workspace built with FastAPI, LangGraph, LangChain, a responsive HTML/CSS/JavaScript interface, and local JSON file storage.
 
 ## Architecture
 
@@ -46,7 +46,7 @@ flowchart TD
     end
 
     subgraph LLM["LLM Providers"]
-        LLMF[llm_providers.py<br/>OpenAI | Anthropic | Google | Ollama | OpenRouter]
+        LLMF[llm_providers.py<br/>OpenAI | Anthropic | Google | Groq | Ollama | OpenRouter]
     end
 
     subgraph Services["Services"]
@@ -100,6 +100,7 @@ resume_creator/
 │       ├── agents/
 │       │   ├── research_agent.py
 │       │   ├── optimization_agent.py
+│       │   ├── resume_editor_agent.py
 │       │   ├── structuring_agent.py
 │       │   ├── rendering_agent.py
 │       │   └── export_agent.py
@@ -110,7 +111,7 @@ resume_creator/
 │       │   └── resume_service.py
 │       ├── templates/           # LaTeX templates (*.tex)
 │       └── utils/
-│           ├── llm_providers.py # OpenAI, Anthropic, Google, Ollama, OpenRouter
+│           ├── llm_providers.py # OpenAI, Anthropic, Google, Groq, Ollama, OpenRouter
 │           ├── renderer.py
 │           └── latex_utils.py
 ├── frontend/
@@ -123,14 +124,14 @@ resume_creator/
 ## Prerequisites
 
 - Python 3.11+
-- Ollama (for local LLM) or API keys for OpenAI/Anthropic/Google/OpenRouter
+- A provider selected in the app's AI settings, or a local Ollama service
 - TeX Live (for PDF generation) or pandoc (for DOCX conversion)
 
 ## Setup
 
 1. Clone the repository and navigate to the project directory:
 ```bash
-cd /home/sandip/Resume_Agent
+cd /path/to/Resume-agent-
 ```
 
 2. Create a virtual environment:
@@ -144,16 +145,12 @@ source res/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Configure environment:
+4. Create required directories:
 ```bash
-cp .env.example .env
-# Edit .env with your LLM credentials (DATA_DIR selects local JSON storage)
+mkdir -p generated uploads logs data
 ```
 
-5. Create required directories:
-```bash
-mkdir -p generated uploads logs
-```
+The app stores named resume files locally. Configure an AI provider in **AI settings** in the app; API keys are kept in the browser and are not written to `.env` or the app's JSON records. Cloud providers receive the resume text used for their requests and may apply their own usage charges and data policies. Ollama is available for a local provider.
 
 ## Running the Application
 
@@ -169,16 +166,24 @@ Open `http://127.0.0.1:8001` for the resume builder or `http://127.0.0.1:8001/do
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/resume/create` | Create a new resume |
-| GET | `/api/resume/{id}` | Get resume details |
+| POST | `/api/resume/create` | Create a uniquely named resume file |
+| PUT | `/api/resume/{id}` | Update a named resume file |
+| GET | `/api/resumes` | List saved resume files |
+| GET | `/api/resume/{id}` | Open a saved resume file |
+| POST | `/api/resume/{id}/chat` | Edit a resume or ask for layout ideas |
+| POST | `/api/resume/{id}/apply-layout` | Apply a saved layout |
+| GET | `/api/layouts` | List built-in and AI-generated layouts |
+| POST | `/api/layouts/generate` | Ask the selected AI to create layout options |
+| POST | `/api/ai/test` | Test AI settings |
 | GET | `/api/resume/{id}/pdf` | Download PDF |
 | GET | `/api/resume/{id}/docx` | Download DOCX |
 | GET | `/api/templates` | List available templates |
 
 ## LLM Providers
 
-Supported providers (configure in `.env`):
-- **Ollama** (default, local)
+Choose a provider in **AI settings** in the app:
+- **Ollama** (local)
+- **Groq**
 - **OpenAI** (GPT-4o)
 - **Anthropic** (Claude)
 - **Google** (Gemini)
@@ -191,17 +196,13 @@ Place `.tex` templates in `resume_creator/backend/app/templates/`:
 - `professional.tex`
 - `simple.tex`
 
-## Environment Variables
-
-See `.env.example` for all available configuration options.
-
 ## Tech Stack
 
 - **Frontend**: Responsive HTML, CSS, and JavaScript
 - **Backend**: FastAPI
 - **Agent Framework**: LangChain, LangGraph
 - **Storage**: Local JSON files in `data/`
-- **LLM**: Provider abstraction (OpenAI, Gemini, Claude, Ollama, OpenRouter)
+- **LLM**: Provider settings in the app (OpenAI, Gemini, Claude, Groq, Ollama, OpenRouter)
 - **Rendering**: Jinja2, LaTeX, pdflatex, Pandoc
 
 ## License

@@ -32,7 +32,7 @@ class ResumeState(TypedDict, total=False):
 
 async def validate_node(state: ResumeState) -> ResumeState:
     payload = state["payload"] = CreateResumeRequest(**state["input"]).model_dump(
-        exclude={"ai_config", "file_name"}
+        exclude={"ai_config", "file_name", "layout_id"}
     )
     state.setdefault("logs", []).append("validated")
     return state

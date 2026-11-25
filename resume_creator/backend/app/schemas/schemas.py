@@ -46,10 +46,12 @@ class AIConfig(BaseModel):
     api_key: str = Field(default="", max_length=512)
     model: str = Field(default="", max_length=160)
     base_url: str = Field(default="", max_length=512)
+    cloud_authorized: bool = False
 
 
 class CreateResumeRequest(BaseModel):
     file_name: str = Field(..., min_length=1, max_length=80)
+    layout_id: Optional[str] = None
     user_profile: PersonalInfo
     education: list[EducationItem] = Field(default_factory=list)
     experience: list[ExperienceItem] = Field(default_factory=list)

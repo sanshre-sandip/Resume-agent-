@@ -9,7 +9,7 @@ from typing import Any
 from ..config import settings
 
 _lock = threading.RLock()
-_root = Path(os.getenv("DATA_DIR", str(Path(settings.generated_dir).parent / "data")))
+_root = Path(os.getenv("DATA_DIR", str(Path(__file__).resolve().parents[4] / "data"))).expanduser()
 
 
 def _path(collection: str) -> Path:

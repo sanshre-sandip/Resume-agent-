@@ -94,6 +94,8 @@ def get_llm_provider(user_config: Any) -> LLMProvider:
     api_key = str(user_config.get("api_key", ""))
     model = str(user_config.get("model", ""))
     base_url = str(user_config.get("base_url", ""))
+    if provider_name != "ollama" and not user_config.get("cloud_authorized", False):
+        raise ValueError("Confirm in AI settings that you have permission to use this cloud provider key.")
     if provider_name != "ollama" and not api_key:
         raise ValueError("Add your API key in AI settings before using this provider.")
     default_models = {

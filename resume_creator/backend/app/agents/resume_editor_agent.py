@@ -27,10 +27,11 @@ reply (string),
 structured_data (the complete updated resume JSON with header, summary, experience, projects,
 education, skills, certificates),
 template_name (one allowed template),
-style (object containing all four allowed style settings).
+style (object containing all seven allowed style settings).
 layouts (an array of zero to three new layout suggestions, each with name, description,
 template_name, and style. When the user asks for more layout ideas, return two or three
-distinct suggestions. Otherwise return an empty array.)
+distinct suggestions and leave the current resume content and layout unchanged. Otherwise return
+an empty array.)
 Preserve every field the user did not ask to change. Output no markdown or text outside JSON."""
 
 

@@ -4,7 +4,6 @@ import os
 import re
 import uuid
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, status
@@ -122,6 +121,34 @@ def _render_record(record: dict[str, Any]) -> None:
     save_record("resumes", record)
 
 
+def _source_data_from_structured(record: dict[str, Any]) -> dict[str, Any]:
+    structured = record.get("structured_data") or {}
+    header = structured.get("header") or {}
+    old_source = record.get("source_data") or {}
+    old_profile = old_source.get("user_profile") or {}
+    profile = {
+        "full_name": header.get("full_name") or header.get("name") or old_profile.get("full_name", ""),
+        "email": header.get("email") or old_profile.get("email", ""),
+        "phone": header.get("phone") or old_profile.get("phone", ""),
+        "address": header.get("address") or old_profile.get("address"),
+        "linkedin": header.get("linkedin") or old_profile.get("linkedin"),
+        "github": header.get("github") or old_profile.get("github"),
+        "portfolio": header.get("portfolio") or old_profile.get("portfolio"),
+    }
+    return {
+        **old_source,
+        "user_profile": profile,
+        "target_role": record.get("target_role", ""),
+        "template_name": record.get("template_name", "modern"),
+        "style": normalize_style(record.get("style")),
+        "experience": structured.get("experience", []),
+        "education": structured.get("education", []),
+        "projects": structured.get("projects", []),
+        "certificates": structured.get("certificates", []),
+        "skills": structured.get("skills", []),
+    }
+
+
 def _save_layout_suggestions(proposals: list[dict[str, Any]]) -> list[SavedLayoutResponse]:
     saved: list[SavedLayoutResponse] = []
     for item in proposals[:3]:
@@ -143,6 +170,13 @@ def _save_layout_suggestions(proposals: list[dict[str, Any]]) -> list[SavedLayou
     return saved
 
 
+def _matching_layout_id(template_name: str, style: dict[str, str]) -> str | None:
+    for layout in BUILT_IN_LAYOUTS + list_records("layouts"):
+        if layout.get("template_name") == template_name and normalize_style(layout.get("style")) == style:
+            return layout.get("id")
+    return None
+
+
 @router.post("/resume/create", response_model=ResumeDetailResponse, status_code=status.HTTP_201_CREATED)
 async def create_resume(payload: CreateResumeRequest):
     _check_unique_name(payload.file_name)
@@ -155,8 +189,8 @@ async def create_resume(payload: CreateResumeRequest):
     record = {
         "id": str(uuid.uuid4()), "file_name": payload.file_name, "user_id": owner["id"],
         "target_role": payload.target_role, "template_name": payload.template_name,
-        "style": style, "layout_id": None,
-        "source_data": payload.model_dump(exclude={"ai_config", "file_name"}),
+        "style": style, "layout_id": payload.layout_id,
+        "source_data": payload.model_dump(exclude={"ai_config", "file_name", "layout_id"}),
         "structured_data": None, "latex_content": None, "pdf_path": None, "docx_path": None,
         "created_at": now_iso(), "updated_at": now_iso(),
     }
@@ -180,7 +214,8 @@ async def update_resume(resume_id: str, payload: CreateResumeRequest):
     record.update({
         "file_name": payload.file_name, "target_role": payload.target_role,
         "template_name": payload.template_name, "style": normalize_style(payload.style),
-        "source_data": payload.model_dump(exclude={"ai_config", "file_name"}),
+        "layout_id": payload.layout_id,
+        "source_data": payload.model_dump(exclude={"ai_config", "file_name", "layout_id"}),
         "updated_at": now_iso(),
     })
     record["created_at"] = previous_created
@@ -234,15 +269,22 @@ def chat_with_resume(resume_id: str, payload: ResumeChatRequest):
         logger.error("Resume assistant request failed: %s", detail)
         raise HTTPException(status_code=502, detail=detail) from None
 
-    record["structured_data"] = result["structured_data"]
-    record["template_name"] = result["template_name"]
-    record["style"] = normalize_style(result["style"])
-    try:
-        _render_record(record)
-    except Exception as exc:  # noqa: BLE001
-        detail = _safe_error(exc, payload.ai_config.api_key)
-        logger.error("Resume re-render failed: %s", detail)
-        raise HTTPException(status_code=500, detail=detail) from None
+    suggestion_only = bool(re.search(
+        r"\b(more|new|some|three|two|different|another)\b.{0,40}\b(layout|design)s?\b|\b(layout|design)s?\b.{0,40}\b(ideas?|options?|suggestions?)\b",
+        payload.message.lower(),
+    ))
+    if not suggestion_only:
+        record["structured_data"] = result["structured_data"]
+        record["template_name"] = result["template_name"]
+        record["style"] = normalize_style(result["style"])
+        record["layout_id"] = _matching_layout_id(record["template_name"], record["style"])
+        record["source_data"] = _source_data_from_structured(record)
+        try:
+            _render_record(record)
+        except Exception as exc:  # noqa: BLE001
+            detail = _safe_error(exc, payload.ai_config.api_key)
+            logger.error("Resume re-render failed: %s", detail)
+            raise HTTPException(status_code=500, detail=detail) from None
     layouts = _save_layout_suggestions(result.get("layouts", []))
     return ResumeChatResponse(reply=result["reply"], resume=_detail(record), layouts=layouts)
 
