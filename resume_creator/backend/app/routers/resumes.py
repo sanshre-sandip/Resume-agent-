@@ -6,8 +6,8 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import FileResponse
 
-from ..database.file_store import get_record, list_records, now_iso, save_record
-from ..schemas.schemas import CreateResumeRequest, ResumeResponse, ResumeDetailResponse, TemplateResponse
+from ..database.file_store import get_record, now_iso, save_record
+from ..schemas.schemas import CreateResumeRequest, ResumeDetailResponse, TemplateResponse
 from ..config import settings
 from ..graph.resume_graph import build_resume_graph
 from ..utils.renderer import list_available_templates
@@ -91,10 +91,3 @@ def get_templates():
     return [TemplateResponse(name=i["name"], description=i["filename"], available=i["available"]) for i in items]
 
 
-@router.get("/history", response_model=list[ResumeResponse])
-def get_history(limit: int = 50):
-    rows = sorted(list_records("resumes"), key=lambda row: row.get("created_at", ""), reverse=True)[:limit]
-    return [ResumeResponse(id=r["id"], user_id=r["user_id"], target_role=r["target_role"],
-                           template_name=r["template_name"], pdf_path=r.get("pdf_path"),
-                           docx_path=r.get("docx_path"), created_at=datetime.fromisoformat(r["created_at"]))
-            for r in rows]

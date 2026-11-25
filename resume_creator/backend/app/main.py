@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
 from .config import settings
-from .routers import resumes, research
+from .routers import resumes
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,6 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(resumes.router)
-    app.include_router(research.router)
 
     static_dir = Path(__file__).resolve().parents[2] / "frontend" / "static"
     app.mount("/assets", StaticFiles(directory=static_dir), name="assets")
