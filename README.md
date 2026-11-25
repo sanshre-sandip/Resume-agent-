@@ -1,10 +1,10 @@
 # AI Resume Creator
 
-AI-powered resume generation platform built with FastAPI, LangGraph, LangChain, local JSON file storage, and Streamlit.
+AI-powered resume generation platform built with FastAPI, LangGraph, LangChain, a responsive HTML/CSS/JavaScript interface, and local JSON file storage.
 
 ## Architecture
 
-Streamlit UI -> FastAPI -> LangGraph Workflow -> Local JSON files
+Web UI -> FastAPI -> LangGraph Workflow -> Local JSON files
 
 ### LangGraph Nodes
 1. User Profile Validation
@@ -18,7 +18,7 @@ Streamlit UI -> FastAPI -> LangGraph Workflow -> Local JSON files
 
 ```mermaid
 flowchart TD
-    subgraph Frontend["Streamlit Frontend"]
+    subgraph Frontend["Web Frontend"]
         FORM[User Form Fields]
         SUBMIT[POST /api/resume/create]
     end
@@ -62,7 +62,7 @@ flowchart TD
 
     subgraph Response["Response"]
         OUT[ResumeDetailResponse<br/>structured_data, latex, pdf, docx]
-        DL[Download Buttons<br/>Streamlit UI]
+        DL[Download Buttons<br/>Web UI]
     end
 
     FORM --> SUBMIT --> ROUTER
@@ -115,7 +115,7 @@ resume_creator/
 │           ├── renderer.py
 │           └── latex_utils.py
 ├── frontend/
-│   └── streamlit_app.py         # Streamlit UI
+│   └── static/                  # HTML, CSS, and JavaScript UI
 ├── generated/                   # Generated PDFs and DOCX
 ├── uploads/                     # User uploads
 └── logs/                        # Application logs
@@ -158,17 +158,13 @@ mkdir -p generated uploads logs
 
 ## Running the Application
 
-### Start the FastAPI Backend
+### Start the application
 
 ```bash
-uvicorn resume_creator.backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn resume_creator.backend.app.main:app --host 127.0.0.1 --port 8001 --reload
 ```
 
-### Start the Streamlit Frontend
-
-```bash
-streamlit run resume_creator/frontend/streamlit_app.py
-```
+Open `http://127.0.0.1:8001` for the resume builder or `http://127.0.0.1:8001/docs` for the API docs.
 
 ## API Endpoints
 
@@ -204,7 +200,7 @@ See `.env.example` for all available configuration options.
 
 ## Tech Stack
 
-- **Frontend**: Streamlit
+- **Frontend**: Responsive HTML, CSS, and JavaScript
 - **Backend**: FastAPI
 - **Agent Framework**: LangChain, LangGraph
 - **Storage**: Local JSON files in `data/`
