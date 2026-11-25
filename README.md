@@ -175,8 +175,6 @@ Open `http://127.0.0.1:8001` for the resume builder or `http://127.0.0.1:8001/do
 | GET | `/api/resume/{id}/pdf` | Download PDF |
 | GET | `/api/resume/{id}/docx` | Download DOCX |
 | GET | `/api/templates` | List available templates |
-| GET | `/api/history` | Get resume history |
-| GET | `/api/research/{role}` | Research job market |
 
 ## LLM Providers
 
