@@ -9,13 +9,43 @@ from ..config import settings
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_STYLE = {
+    "accent_color": "1F6FEB",
+    "font_size": "11pt",
+    "paper_size": "a4paper",
+    "margin": "1.8cm",
+    "header_alignment": "left",
+    "section_style": "accent-rule",
+    "spacing": "balanced",
+}
+STYLE_OPTIONS = {
+    "accent_color": {"1F6FEB", "6F42C1", "0F766E", "B45309", "1F2937", "BE123C"},
+    "font_size": {"10pt", "11pt", "12pt"},
+    "paper_size": {"a4paper", "letterpaper"},
+    "margin": {"1.4cm", "1.8cm", "2cm"},
+    "header_alignment": {"left", "center"},
+    "section_style": {"accent-rule", "uppercase-rule", "minimal"},
+    "spacing": {"compact", "balanced", "airy"},
+}
+
+
+def normalize_style(style: dict[str, Any] | None) -> dict[str, str]:
+    normalized = dict(DEFAULT_STYLE)
+    for key, allowed_values in STYLE_OPTIONS.items():
+        value = (style or {}).get(key)
+        if value in allowed_values:
+            normalized[key] = value
+    return normalized
+
 
 def normalize_title(text: str) -> str:
     t = re.sub(r"\s+", " ", text or "").strip()
     return t.title() if t else ""
 
 
-def build_context(structured: dict[str, Any], pdf_path: str | None) -> dict[str, Any]:
+def build_context(
+    structured: dict[str, Any], pdf_path: str | None, style: dict[str, Any] | None = None
+) -> dict[str, Any]:
     header = {**(structured.get("header") or {})}
     header.setdefault("name", header.get("full_name") or "")
     header["full_name"] = header.get("name") or header.get("full_name") or ""
@@ -44,11 +74,12 @@ def build_context(structured: dict[str, Any], pdf_path: str | None) -> dict[str,
         "skills": skills,
         "certificates": structured.get("certificates") or [],
         "pdf_path": pdf_path or "",
+        **normalize_style(style),
     }
 
 
-def build_latex(structured_data: dict[str, Any], template_name: str) -> str:
-    ctx = build_context(structured_data, None)
+def build_latex(structured_data: dict[str, Any], template_name: str, style: dict[str, Any] | None = None) -> str:
+    ctx = build_context(structured_data, None, style)
     return render_latex(template_name=template_name, context=ctx, template_dir=settings.template_dir)
 
 

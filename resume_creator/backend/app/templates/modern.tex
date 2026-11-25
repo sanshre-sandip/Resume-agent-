@@ -1,25 +1,39 @@
-\documentclass[11pt,a4paper]{article}
-\usepackage[margin=1.8cm]{geometry}
+\documentclass[\VAR{font_size},\VAR{paper_size}]{article}
+\usepackage[margin=\VAR{margin}]{geometry}
 \usepackage{enumitem}
 \usepackage{titlesec}
 \usepackage[hidelinks]{hyperref}
 \usepackage{xcolor}
 
-\definecolor{accent}{HTML}{1F6FEB}
+\definecolor{accent}{HTML}{\VAR{accent_color}}
 
 \setlist[itemize]{leftmargin=1.2em,topsep=2pt,itemsep=1pt}
+\BLOCK{ if section_style == "uppercase-rule" }
+\titleformat{\section}{\bfseries\uppercase\color{accent}}{}{0em}{}[\titlerule]
+\BLOCK{ elif section_style == "minimal" }
+\titleformat{\section}{\large\bfseries\color{accent}}{}{0em}{}
+\BLOCK{ else }
 \titleformat{\section}{\large\bfseries\color{accent}}{}{0em}{}[\titlerule]
+\BLOCK{ endif }
+\BLOCK{ if spacing == "compact" }
+\titlespacing{\section}{0pt}{7pt}{3pt}
+\BLOCK{ elif spacing == "airy" }
+\titlespacing{\section}{0pt}{15pt}{7pt}
+\BLOCK{ else }
 \titlespacing{\section}{0pt}{10pt}{4pt}
+\BLOCK{ endif }
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
 
 \begin{document}
 
+\BLOCK{ if header_alignment == "center" }\begin{center}\BLOCK{ endif }
 {\Huge\bfseries \VAR{header.full_name}}\\[2pt]
 \BLOCK{ if header.title }{\large\color{accent}\VAR{header.title}}\\[4pt]\BLOCK{ endif }
 \small
 \VAR{header.email}\BLOCK{ if header.phone } \textbar{} \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.address } \textbar{} \VAR{header.address}\BLOCK{ endif }\\
 \BLOCK{ if header.linkedin }\href{\VAR{header.linkedin}}{LinkedIn}\BLOCK{ endif }\BLOCK{ if header.github } \textbar{} \href{\VAR{header.github}}{GitHub}\BLOCK{ endif }\BLOCK{ if header.portfolio } \textbar{} \href{\VAR{header.portfolio}}{Portfolio}\BLOCK{ endif }
+\BLOCK{ if header_alignment == "center" }\end{center}\BLOCK{ endif }
 
 \BLOCK{ if summary }
 \section{Summary}

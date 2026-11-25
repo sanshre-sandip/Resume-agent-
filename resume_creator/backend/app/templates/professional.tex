@@ -1,23 +1,35 @@
-\documentclass[11pt,letterpaper]{article}
-\usepackage[margin=2cm]{geometry}
+\documentclass[\VAR{font_size},\VAR{paper_size}]{article}
+\usepackage[margin=\VAR{margin}]{geometry}
 \usepackage{enumitem}
 \usepackage{titlesec}
 \usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+
+\definecolor{accent}{HTML}{\VAR{accent_color}}
 
 \setlist[itemize]{leftmargin=1.3em,topsep=2pt,itemsep=1pt}
-\titleformat{\section}{\bfseries\uppercase}{}{0em}{}[\titlerule]
-\titlespacing{\section}{0pt}{12pt}{4pt}
+\BLOCK{ if section_style == "minimal" }
+\titleformat{\section}{\large\bfseries\color{accent}}{}{0em}{}
+\BLOCK{ elif section_style == "accent-rule" }
+\titleformat{\section}{\large\bfseries\color{accent}}{}{0em}{}[\titlerule]
+\BLOCK{ else }
+\titleformat{\section}{\bfseries\uppercase\color{accent}}{}{0em}{}[\titlerule]
+\BLOCK{ endif }
+\BLOCK{ if spacing == "compact" }\titlespacing{\section}{0pt}{7pt}{3pt}
+\BLOCK{ elif spacing == "airy" }\titlespacing{\section}{0pt}{16pt}{7pt}
+\BLOCK{ else }\titlespacing{\section}{0pt}{12pt}{4pt}\BLOCK{ endif }
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
 
 \begin{document}
 
-\begin{center}
+\BLOCK{ if header_alignment == "center" }\begin{center}\BLOCK{ else }
+\begin{flushleft}\BLOCK{ endif }
 {\LARGE\bfseries \VAR{header.full_name}}\\[2pt]
 \BLOCK{ if header.title }\VAR{header.title}\\[2pt]\BLOCK{ endif }
 \small \VAR{header.email}\BLOCK{ if header.phone } $\cdot$ \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.address } $\cdot$ \VAR{header.address}\BLOCK{ endif }\\
 \BLOCK{ if header.linkedin }\href{\VAR{header.linkedin}}{LinkedIn}\BLOCK{ endif }\BLOCK{ if header.github } $\cdot$ \href{\VAR{header.github}}{GitHub}\BLOCK{ endif }\BLOCK{ if header.portfolio } $\cdot$ \href{\VAR{header.portfolio}}{Portfolio}\BLOCK{ endif }
-\end{center}
+\BLOCK{ if header_alignment == "center" }\end{center}\BLOCK{ else }\end{flushleft}\BLOCK{ endif }
 
 \BLOCK{ if summary }
 \section{Professional Summary}

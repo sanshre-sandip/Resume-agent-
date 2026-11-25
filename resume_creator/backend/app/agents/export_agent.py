@@ -56,14 +56,14 @@ def convert_to_docx(pdf_path: str, output_path: str) -> str | None:
         return None
 
 
-def persist_artifacts(tex_content: str, user_id: str, resume_id: str, generated_dir: str, timestamp: str) -> dict:
+def persist_artifacts(tex_content: str, user_id: str, resume_id: str, generated_dir: str, timestamp: str = "") -> dict:
     base = Path(generated_dir) / user_id / resume_id
     base.mkdir(parents=True, exist_ok=True)
-    tex_path = str(base / f"resume_{timestamp}.tex")
+    tex_path = str(base / "resume.tex")
     with open(tex_path, "w", encoding="utf-8") as fh:
         fh.write(tex_content)
     pdf_path = compile_pdflatex(tex_path=tex_path, output_dir=str(base))
     docx_path = None
     if pdf_path:
-        docx_path = convert_to_docx(pdf_path=pdf_path, output_path=str(base / f"resume_{timestamp}.docx"))
+        docx_path = convert_to_docx(pdf_path=pdf_path, output_path=str(base / "resume.docx"))
     return {"tex_path": tex_path, "pdf_path": pdf_path, "docx_path": docx_path}

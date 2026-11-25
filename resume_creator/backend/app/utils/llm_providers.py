@@ -83,10 +83,45 @@ _PROVIDER_MAP = {
     "google": GoogleProvider,
     "ollama": OllamaProvider,
     "openrouter": OpenRouterProvider,
+    "groq": OpenAIProvider,
 }
 
 
-def get_llm_provider(settings: Any) -> LLMProvider:
+def get_llm_provider(settings: Any, user_config: Any | None = None) -> LLMProvider:
+    if user_config is not None:
+        if hasattr(user_config, "model_dump"):
+            user_config = user_config.model_dump()
+        provider_name = str(user_config.get("provider", "openai")).lower()
+        api_key = str(user_config.get("api_key", ""))
+        model = str(user_config.get("model", ""))
+        base_url = str(user_config.get("base_url", ""))
+        if provider_name != "ollama" and not api_key:
+            raise ValueError("Add your API key in AI settings before using this provider.")
+        default_models = {
+            "openai": "gpt-4o-mini",
+            "anthropic": "claude-3-5-haiku-20241022",
+            "google": "gemini-2.0-flash",
+            "ollama": "llama3.1",
+            "openrouter": "meta-llama/llama-3.1-70b-instruct",
+            "groq": "openai/gpt-oss-20b",
+        }
+        model = model or default_models.get(provider_name, "")
+        provider_cls = _PROVIDER_MAP.get(provider_name)
+        if not provider_cls:
+            raise ValueError(f"Unsupported AI provider: {provider_name}")
+        if provider_name == "openai":
+            return provider_cls(api_key=api_key, base_url=base_url or "https://api.openai.com/v1", model=model)
+        if provider_name == "groq":
+            return provider_cls(api_key=api_key, base_url=base_url or "https://api.groq.com/openai/v1", model=model)
+        if provider_name == "anthropic":
+            return provider_cls(api_key=api_key, model=model)
+        if provider_name == "google":
+            return provider_cls(api_key=api_key, model=model)
+        if provider_name == "ollama":
+            return provider_cls(base_url=base_url or "http://localhost:11434", model=model)
+        if provider_name == "openrouter":
+            return OpenRouterProvider(api_key=api_key, model=model)
+
     provider_name = settings.llm_provider.lower()
     provider_cls = _PROVIDER_MAP.get(provider_name)
     if not provider_cls:

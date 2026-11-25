@@ -1,16 +1,13 @@
 import logging
-import os
 from typing import Any, TypedDict
 from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
-from langchain_core.runnables import RunnableConfig
 
 from ..config import settings
 from ..utils.llm_providers import get_llm_provider
 from ..schemas.schemas import CreateResumeRequest
 from ..services.research_service import get_or_create_research
-from ..agents.research_agent import run_research_agent
 from ..agents.optimization_agent import run_optimization_agent
 from ..agents.structuring_agent import run_structuring_agent
 from ..agents.rendering_agent import LaTeXRenderer
@@ -34,14 +31,16 @@ class ResumeState(TypedDict, total=False):
 
 
 async def validate_node(state: ResumeState) -> ResumeState:
-    payload = state["payload"] = CreateResumeRequest(**state["input"]).model_dump()
+    payload = state["payload"] = CreateResumeRequest(**state["input"]).model_dump(
+        exclude={"ai_config", "file_name"}
+    )
     state.setdefault("logs", []).append("validated")
     return state
 
 
 async def research_node(state: ResumeState) -> ResumeState:
     role = state["input"]["target_role"]
-    llm = get_llm_provider(settings)
+    llm = get_llm_provider(settings, state["input"]["ai_config"])
     data = await get_or_create_research(llm_provider=llm, role=role)
     state["research_data"] = data
     state.setdefault("logs", []).append("researched")
@@ -58,7 +57,7 @@ async def optimize_node(state: ResumeState) -> ResumeState:
         "skills": state["input"].get("skills", []),
         "target_role": state["input"]["target_role"],
     }
-    llm = get_llm_provider(settings)
+    llm = get_llm_provider(settings, state["input"]["ai_config"])
     optimized = await run_optimization_agent(llm=llm, user_profile=profile, research_data=state["research_data"])
     state["optimized_resume"] = optimized
     state.setdefault("logs", []).append("optimized")
@@ -66,7 +65,7 @@ async def optimize_node(state: ResumeState) -> ResumeState:
 
 
 async def structure_node(state: ResumeState) -> ResumeState:
-    llm = get_llm_provider(settings)
+    llm = get_llm_provider(settings, state["input"]["ai_config"])
     structured = await run_structuring_agent(llm=llm, optimized_resume=state.get("optimized_resume", {}), user_profile=state["payload"] or {})
     state["structured_data"] = structured
     state.setdefault("logs", []).append("structured")
@@ -87,7 +86,7 @@ async def render_node(state: ResumeState) -> ResumeState:
     structured["header"] = header
 
     renderer = LaTeXRenderer(template_dir=settings.template_dir)
-    context = build_context(structured, None)
+    context = build_context(structured, None, state["input"].get("style"))
     latex = renderer.render(template_name=template_name, context=context)
     state["latex_content"] = latex
     state.setdefault("logs", []).append("rendered")
@@ -96,12 +95,11 @@ async def render_node(state: ResumeState) -> ResumeState:
 
 async def export_node(state: ResumeState) -> ResumeState:
     user_id = state["input"].get("user_id") or str(uuid.uuid4())
-    resume_id = str(uuid.uuid4())
     ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
     artifacts = persist_artifacts(
         tex_content=state.get("latex_content", ""),
         user_id=user_id,
-        resume_id=resume_id,
+        resume_id=state["input"]["resume_id"],
         generated_dir=settings.generated_dir,
         timestamp=ts,
     )

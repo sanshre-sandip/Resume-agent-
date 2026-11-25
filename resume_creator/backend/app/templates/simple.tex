@@ -1,19 +1,29 @@
-\documentclass[11pt,a4paper]{article}
-\usepackage[margin=2cm]{geometry}
+\documentclass[\VAR{font_size},\VAR{paper_size}]{article}
+\usepackage[margin=\VAR{margin}]{geometry}
 \usepackage{enumitem}
 \usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
 
 \setlist[itemize]{leftmargin=1.2em,topsep=2pt,itemsep=1pt}
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
 
-\newcommand{\rsection}[1]{\bigskip{\large\bfseries #1}\par\hrule\smallskip}
+\definecolor{accent}{HTML}{\VAR{accent_color}}
+\BLOCK{ if section_style == "minimal" }
+\newcommand{\rsection}[1]{\bigskip{\large\bfseries\color{accent} #1}\par}
+\BLOCK{ elif section_style == "uppercase-rule" }
+\newcommand{\rsection}[1]{\bigskip{\large\bfseries\color{accent}\MakeUppercase{#1}}\par\hrule\smallskip}
+\BLOCK{ else }
+\newcommand{\rsection}[1]{\bigskip{\large\bfseries\color{accent} #1}\par\hrule\smallskip}
+\BLOCK{ endif }
 
 \begin{document}
 
+\BLOCK{ if header_alignment == "center" }\begin{center}\BLOCK{ else }\begin{flushleft}\BLOCK{ endif }
 {\LARGE\bfseries \VAR{header.full_name}}\par
 \BLOCK{ if header.title }\VAR{header.title}\par\BLOCK{ endif }
 \VAR{header.email}\BLOCK{ if header.phone } | \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.address } | \VAR{header.address}\BLOCK{ endif }\par
+\BLOCK{ if header_alignment == "center" }\end{center}\BLOCK{ else }\end{flushleft}\BLOCK{ endif }
 
 \BLOCK{ if summary }
 \rsection{Summary}
