@@ -31,6 +31,8 @@
 .resume-preview-section{margin-top:15px}
 .resume-preview-section h3{margin:0 0 6px;padding-bottom:4px;border-bottom:1px solid #dfe0e8;color:var(--resume-accent);font:700 10px Manrope,sans-serif;text-transform:uppercase;letter-spacing:.55px}
 .resume-preview-section p{margin:3px 0;color:#555667;font-size:9px;line-height:1.55;white-space:pre-wrap}
+.resume-preview-items{display:grid;grid-template-columns:repeat(var(--entry-columns,2),minmax(0,1fr));gap:6px 14px}
+.resume-preview-item{min-width:0;break-inside:avoid;color:#555667;font-size:9px;line-height:1.45;overflow-wrap:anywhere}
 .resume-preview-item{margin:0 0 8px;color:#555667;font-size:9px;white-space:pre-wrap}
 .resume-preview-item strong{display:block;color:#303144;font-size:9px;margin-bottom:2px}
 .pdf-viewport{position:relative;padding:0;display:block;background:#55545c}
@@ -59,6 +61,8 @@
 .rail-file-help{color:#8e8d9c;font-size:9px;line-height:1.4}
 .resume-preview-skills{display:grid;grid-template-columns:repeat(var(--skill-columns,2),minmax(0,1fr));column-gap:18px;margin:4px 0 0;padding-left:16px;color:#555667;font-size:9px;line-height:1.55}
 .resume-preview-skills li{padding-left:2px;margin:1px 0;overflow-wrap:anywhere}
+.resume-preview-skills .resume-preview-skill-category{break-inside:avoid}
+.resume-preview-skill-category strong{color:#343746;margin-right:3px}
 .side-rail .rail-note{margin-top:auto}
 .content-grid{grid-template-columns:minmax(0,1.02fr) minmax(330px,.98fr);gap:20px}
 .form-column{grid-column:1;grid-row:1;min-width:0}

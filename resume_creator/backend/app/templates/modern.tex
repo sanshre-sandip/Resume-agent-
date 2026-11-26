@@ -43,27 +43,27 @@
 
 \BLOCK{ if experience }
 \section{Experience}
-\BLOCK{ for item in experience }
+\begin{multicols}{\VAR{section_columns}}\BLOCK{ for item in experience }
 \textbf{\VAR{item.role}} \hfill \VAR{item.duration}\\
 \textit{\VAR{item.company}}\\
 \VAR{item.description}\\[4pt]
-\BLOCK{ endfor }
+\BLOCK{ endfor }\end{multicols}
 \BLOCK{ endif }
 
 \BLOCK{ if projects }
 \section{Projects}
-\BLOCK{ for item in projects }
+\begin{multicols}{\VAR{section_columns}}\BLOCK{ for item in projects }
 \textbf{\VAR{item.name}}\BLOCK{ if item.technologies } \textemdash{} \textit{\VAR{item.technologies}}\BLOCK{ endif }\\
 \VAR{item.description}\\[4pt]
-\BLOCK{ endfor }
+\BLOCK{ endfor }\end{multicols}
 \BLOCK{ endif }
 
 \BLOCK{ if education }
 \section{Education}
-\BLOCK{ for item in education }
+\begin{multicols}{\VAR{section_columns}}\BLOCK{ for item in education }
 \textbf{\VAR{item.degree}} \hfill \VAR{item.graduation_year}\\
 \textit{\VAR{item.institution}}\\[4pt]
-\BLOCK{ endfor }
+\BLOCK{ endfor }\end{multicols}
 \BLOCK{ endif }
 
 \BLOCK{ if skills }
@@ -80,33 +80,35 @@
 \BLOCK{ if certificates }
 \section{Certifications}
 \begin{itemize}
-\BLOCK{ for item in certificates }
+\begin{multicols}{\VAR{section_columns}}\BLOCK{ for item in certificates }
 \item \VAR{item.name}\BLOCK{ if item.issuer } \textemdash{} \VAR{item.issuer}\BLOCK{ endif }
-\BLOCK{ endfor }
+\BLOCK{ endfor }\end{multicols}
 \end{itemize}
 \BLOCK{ endif }
 
 \BLOCK{ if publications }
 \section{Publications}
-\BLOCK{ for item in publications }
+\begin{multicols}{\VAR{section_columns}}\BLOCK{ for item in publications }
 \textbf{\VAR{item.title}}\BLOCK{ if item.venue } \textemdash{} \VAR{item.venue}\BLOCK{ endif }\BLOCK{ if item.date } \hfill \VAR{item.date}\BLOCK{ endif }\par
 \BLOCK{ if item.description }\VAR{item.description}\par\BLOCK{ endif }
 \BLOCK{ if item.url }\href{\VAR{item.url}}{Publication link}\par\BLOCK{ endif }
-\BLOCK{ endfor }
+\BLOCK{ endfor }\end{multicols}
 \BLOCK{ endif }
 \BLOCK{ if awards }
 \section{Awards}
-\BLOCK{ for item in awards }
+\begin{multicols}{\VAR{section_columns}}\BLOCK{ for item in awards }
 \textbf{\VAR{item.name}}\BLOCK{ if item.issuer } \textemdash{} \VAR{item.issuer}\BLOCK{ endif }\BLOCK{ if item.date } \hfill \VAR{item.date}\BLOCK{ endif }\par
 \BLOCK{ if item.description }\VAR{item.description}\par\BLOCK{ endif }
-\BLOCK{ endfor }
+\BLOCK{ endfor }\end{multicols}
 \BLOCK{ endif }
 \BLOCK{ if languages }
 \section{Languages}
+\begin{multicols}{\VAR{section_columns}}
 \begin{itemize}
 \BLOCK{ for item in languages }\item \VAR{item.name}\BLOCK{ if item.proficiency } \textemdash{} \VAR{item.proficiency}\BLOCK{ endif }
 \BLOCK{ endfor }
 \end{itemize}
+\end{multicols}
 \BLOCK{ endif }
 
 \end{document}

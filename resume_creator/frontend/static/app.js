@@ -32,7 +32,29 @@ function writeLocalMap(key, value) {
 
 function parseSkillItems(value) {
   const values = Array.isArray(value) ? value : String(value || "").split(/[,;|\n]+/);
-  return values.map((item) => clean(item).replace(/^[*•·\-]\s*/, "")).filter(Boolean);
+  const items = values.map((item) => clean(item).replace(/^[*•·\-]\s*/, "")).filter(Boolean);
+  const grouped = [];
+  let category = "";
+  let categorySkills = [];
+  const flushCategory = () => {
+    if (category) grouped.push(`${category}: ${categorySkills.join(", ")}`);
+    category = "";
+    categorySkills = [];
+  };
+  for (const item of items) {
+    const match = item.match(/^([^:]{2,60}):\s*(.*)$/);
+    if (match) {
+      flushCategory();
+      category = match[1].trim();
+      if (match[2].trim()) categorySkills.push(match[2].trim());
+    } else if (category) {
+      categorySkills.push(item);
+    } else {
+      grouped.push(item);
+    }
+  }
+  flushCategory();
+  return grouped;
 }
 
 function chatContextKey() { return currentResumeId || "new-layout"; }
@@ -288,8 +310,10 @@ function previewSection(sheet, title, rows, fields) {
   section.className = "resume-preview-section";
   const heading = document.createElement("h3");
   heading.textContent = title;
-  section.append(heading);
   const items = Array.isArray(rows) ? rows : [rows];
+  const itemGrid = document.createElement("div");
+  itemGrid.className = "resume-preview-items";
+  itemGrid.style.setProperty("--entry-columns", String(Math.min(3, Math.max(2, Math.ceil(items.length / 6)))));
   items.forEach((row) => {
     const item = document.createElement("div");
     item.className = "resume-preview-item";
@@ -307,8 +331,9 @@ function previewSection(sheet, title, rows, fields) {
         }
       });
     }
-    section.append(item);
+    itemGrid.append(item);
   });
+  section.append(heading, itemGrid);
   sheet.append(section);
 }
 
@@ -379,7 +404,15 @@ function refreshPreview(resume = currentResume) {
     list.style.setProperty("--skill-columns", String(Math.min(3, Math.max(2, Math.ceil(parseSkillItems(skillsText).length / 12)))));
     parseSkillItems(skillsText).forEach((skill) => {
       const item = document.createElement("li");
-      item.textContent = skill;
+      const categoryEnd = skill.indexOf(":");
+      if (categoryEnd > 1) {
+        const category = document.createElement("strong");
+        category.textContent = `${skill.slice(0, categoryEnd)}:`;
+        item.append(category, document.createTextNode(skill.slice(categoryEnd + 1)));
+        item.classList.add("resume-preview-skill-category");
+      } else {
+        item.textContent = skill;
+      }
       list.append(item);
     });
     section.append(heading, list);

@@ -34,24 +34,24 @@
 
 \BLOCK{ if experience }
 \rsection{Experience}
-\BLOCK{ for item in experience }
+\begin{multicols}{\VAR{section_columns}}\BLOCK{ for item in experience }
 \textbf{\VAR{item.role}}, \VAR{item.company} \hfill \VAR{item.duration}\par
 \VAR{item.description}\par\smallskip
-\BLOCK{ endfor }
+\BLOCK{ endfor }\end{multicols}
 \BLOCK{ endif }
 
 \BLOCK{ if projects }
 \rsection{Projects}
-\BLOCK{ for item in projects }
+\begin{multicols}{\VAR{section_columns}}\BLOCK{ for item in projects }
 \textbf{\VAR{item.name}}: \VAR{item.description}\par\smallskip
-\BLOCK{ endfor }
+\BLOCK{ endfor }\end{multicols}
 \BLOCK{ endif }
 
 \BLOCK{ if education }
 \rsection{Education}
-\BLOCK{ for item in education }
+\begin{multicols}{\VAR{section_columns}}\BLOCK{ for item in education }
 \VAR{item.degree}, \VAR{item.institution} \hfill \VAR{item.graduation_year}\par
-\BLOCK{ endfor }
+\BLOCK{ endfor }\end{multicols}
 \BLOCK{ endif }
 
 \BLOCK{ if skills_line }
@@ -68,9 +68,9 @@
 \BLOCK{ if certificates }
 \rsection{Certifications}
 \begin{itemize}
-\BLOCK{ for item in certificates }
+\begin{multicols}{\VAR{section_columns}}\BLOCK{ for item in certificates }
 \item \VAR{item.name}\BLOCK{ if item.issuer } -- \VAR{item.issuer}\BLOCK{ endif }
-\BLOCK{ endfor }
+\BLOCK{ endfor }\end{multicols}
 \end{itemize}
 \BLOCK{ endif }
 

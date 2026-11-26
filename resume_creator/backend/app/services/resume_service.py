@@ -81,15 +81,40 @@ def build_context(
     header["public_links"] = public_links
     initials = "".join(word[0] for word in (header["full_name"] or "").split()[:2]).upper()
 
-    skills = structured.get("skills") or []
-    if isinstance(skills, str):
-        skills = [s.strip().lstrip("*•·- ") for s in re.split(r"[,;|\n]", skills) if s.strip()]
-    elif isinstance(skills, dict):
-        skills = [f"{str(group).strip()}: {str(skill).strip()}" for group, items in skills.items() for skill in (items if isinstance(items, list) else [items]) if str(skill).strip()]
-    else:
-        skills = [str(skill).strip().lstrip("*•·- ") for skill in skills if str(skill).strip()]
+    raw_skills = structured.get("skills") or []
+    if isinstance(raw_skills, str):
+        raw_skills = re.split(r"[,;|\n]", raw_skills)
+    elif isinstance(raw_skills, dict):
+        raw_skills = [
+            f"{str(group).strip()}: {', '.join(str(item).strip() for item in (items if isinstance(items, list) else [items]) if str(item).strip())}"
+            for group, items in raw_skills.items()
+        ]
+    skills = [str(skill).strip().lstrip("*•·- ") for skill in raw_skills if str(skill).strip()]
+    grouped_skills: list[str] = []
+    category = ""
+    category_skills: list[str] = []
+    for skill in skills:
+        match = re.match(r"^([^:]{2,60}):\s*(.*)$", skill)
+        if match:
+            if category:
+                grouped_skills.append(f"{category}: {', '.join(category_skills)}")
+            category = match.group(1).strip()
+            category_skills = [match.group(2).strip()] if match.group(2).strip() else []
+        elif category:
+            category_skills.append(skill)
+        else:
+            grouped_skills.append(skill)
+    if category:
+        grouped_skills.append(f"{category}: {', '.join(category_skills)}")
+    skills = grouped_skills
     skills_line = ", ".join(skills)
     skill_columns = min(3, max(2, (len(skills) + 11) // 12))
+    repeatable_sections = [
+        structured.get(key) or []
+        for key in ("experience", "projects", "education", "certificates", "publications", "awards", "languages")
+    ]
+    max_section_entries = max((len(items) for items in repeatable_sections), default=0)
+    section_columns = min(3, max(2, (max_section_entries + 3) // 4))
 
     return {
         "header": header,
@@ -100,6 +125,7 @@ def build_context(
         "skills_line": skills_line,
         "skills": skills,
         "skill_columns": skill_columns,
+        "section_columns": section_columns,
         "certificates": structured.get("certificates") or [],
         "awards": structured.get("awards") or [],
         "languages": structured.get("languages") or [],
