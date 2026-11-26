@@ -1,16 +1,16 @@
 import logging
 from pathlib import Path
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from urllib.parse import urlsplit
 
 from .config import settings
-from .routers import auth, resumes
+from .routers import resumes
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,6 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    app.include_router(auth.router)
     app.include_router(resumes.router)
 
     @app.exception_handler(RequestValidationError)
@@ -55,30 +54,11 @@ def create_app() -> FastAPI:
 
     @app.get("/", include_in_schema=False)
     def home():
-        return FileResponse(static_dir / "index.html")
-
-    @app.get("/workspace", include_in_schema=False)
-    def workspace(request: Request):
-        try:
-            auth.get_current_user(request)
-        except HTTPException:
-            return RedirectResponse("/login?next=%2Fworkspace", status_code=303)
         return FileResponse(static_dir / "workspace.html")
 
-    @app.get("/login", include_in_schema=False)
-    @app.get("/register", include_in_schema=False)
-    @app.get("/forgot-password", include_in_schema=False)
-    @app.get("/reset-password", include_in_schema=False)
-    def authentication_page():
-        return FileResponse(static_dir / "auth.html")
-
-    @app.get("/account", include_in_schema=False)
-    def account_page(request: Request):
-        try:
-            auth.get_current_user(request)
-        except HTTPException:
-            return RedirectResponse("/login?next=%2Faccount", status_code=303)
-        return FileResponse(static_dir / "account.html")
+    @app.get("/workspace", include_in_schema=False)
+    def workspace():
+        return FileResponse(static_dir / "workspace.html")
 
     @app.get("/privacy", include_in_schema=False)
     def privacy_page():

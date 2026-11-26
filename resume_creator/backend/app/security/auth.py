@@ -66,18 +66,8 @@ def session_user_id(request: Request) -> str | None:
 
 
 def get_current_user(request: Request) -> dict[str, Any]:
-    if request.method not in {"GET", "HEAD", "OPTIONS"}:
-        require_csrf(request)
-    user_id = session_user_id(request)
-    user = get_record("users", "id", user_id) if user_id else None
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sign in to continue.")
-    if settings.require_email_verification and not user.get("email_verified", False):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Verify your email before continuing.")
-    claims = session_claims(request) or {}
-    if claims.get("ver", 0) != user.get("session_version", 0):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Your session has expired. Sign in again.")
-    return user
+    """Local-only identity used to keep the existing per-owner data model simple."""
+    return {"id": "local", "name": "Local user", "email": "local@localhost"}
 
 
 def require_csrf(request: Request) -> None:

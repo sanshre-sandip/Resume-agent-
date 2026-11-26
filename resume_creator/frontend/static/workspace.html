@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/assets/styles.css" />
-    <script src="/assets/security.js" defer></script>
   </head>
   <body>
     <div class="app-shell">
@@ -19,11 +18,11 @@
         <a class="rail-link active" href="#builder"><span class="rail-icon">✳</span> Resume studio</a>
         <div class="rail-files"><span class="mini-label">YOUR RESUME FILES</span><label class="rail-files-label" for="file-name-input">Resume file name <b>*</b></label><input id="file-name-input" class="rail-file-name" placeholder="e.g. Full Stack Developer 2026" required minlength="2" maxlength="80" aria-describedby="file-name-help" /><small id="file-name-help" class="rail-file-help">Give each saved resume a unique name.</small><label class="rail-files-label" for="saved-resumes">Open a saved resume</label><select id="saved-resumes"><option value="">No saved resumes yet</option></select><div class="resume-actions"><button type="button" class="outline-button" id="rename-resume">Rename</button><button type="button" class="outline-button" id="duplicate-resume">Duplicate</button><button type="button" class="outline-button" id="delete-resume">Delete</button></div><button type="button" id="new-resume" class="outline-button">＋ New resume</button></div>
         <div class="rail-note"><span class="sparkle">✦</span><strong>Your next chapter<br />starts here.</strong><p>A clear, confident resume is closer than you think.</p></div>
-        <div class="rail-footer"><a href="/account">Account settings</a><span class="status-dot"></span> Private workspace</div>
+        <div class="rail-footer"><span class="status-dot"></span> Saved on this computer</div>
       </aside>
 
       <main class="main-area" id="builder">
-        <header class="topbar"><div class="breadcrumb">Workspace <span>/</span> <strong>Resume studio</strong></div><div class="topbar-actions"><a class="account-top-link" href="/account" id="account-link">Account</a><button class="settings-button" id="settings-open" type="button">AI options</button></div></header>
+        <header class="topbar"><div class="breadcrumb">Local workspace <span>/</span> <strong>Resume studio</strong></div><div class="topbar-actions"><button class="settings-button" id="settings-open" type="button">AI options</button></div></header>
 
         <div class="page-wrap">
           <div class="content-grid">
@@ -95,7 +94,7 @@
                 <div id="publications-list" class="entry-list"><div class="entry-card" data-entry="publication"><div class="entry-controls"><button type="button" class="move-entry" data-move="up" aria-label="Move publication up" title="Move up">↑</button><button type="button" class="move-entry" data-move="down" aria-label="Move publication down" title="Move down">↓</button><button type="button" class="remove-entry" aria-label="Remove publication">×</button></div><div class="field-grid"><label class="field span-2"><span>Title</span><input data-field="title" /></label><label class="field"><span>Venue or journal</span><input data-field="venue" /></label><label class="field"><span>Date</span><input data-field="date" /></label><label class="field span-2"><span>Link</span><input data-field="url" inputmode="url" placeholder="https://" /></label><label class="field span-2"><span>Contribution or result</span><textarea data-field="description" rows="2"></textarea></label></div></div></div>
               </section>
 
-              <div class="submit-row"><div class="submit-note"><span>✦</span><div><strong>Saved to your private account</strong><small id="save-status">Save changes when you’re ready.</small></div></div><button class="primary-button" id="generate-button" type="submit"><span>Save resume</span><span class="button-arrow">↗</span></button></div>
+              <div class="submit-row"><div class="submit-note"><span>✦</span><div><strong>Saved on this computer</strong><small id="save-status">Save changes when you’re ready.</small></div></div><button class="primary-button" id="generate-button" type="submit"><span>Save resume</span><span class="button-arrow">↗</span></button></div>
               <div id="form-message" class="form-message" role="status" aria-live="polite" hidden></div>
             </form>
 

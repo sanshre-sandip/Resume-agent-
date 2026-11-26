@@ -1152,22 +1152,9 @@ document.querySelector("#chat-input").addEventListener("keydown", (event) => {
 });
 
 async function initialize() {
-  try {
-    const authResponse = await fetch("/api/auth/me");
-    const auth = await authResponse.json();
-    if (!auth.authenticated) {
-      window.location.replace(`/login?next=${encodeURIComponent("/workspace")}`);
-      return;
-    }
-    chatCacheKey = `nhyapu.chat-cache.${auth.user.id}`;
-    undoCacheKey = `nhyapu.undo-cache.${auth.user.id}`;
-    aiKeyPrefix = `nhyapu.ai-key.${auth.user.id}.`;
-    const accountLink = document.querySelector("#account-link");
-    if (accountLink && auth.user?.name) accountLink.textContent = auth.user.name;
-  } catch {
-    window.location.replace(`/login?next=${encodeURIComponent("/workspace")}`);
-    return;
-  }
+  chatCacheKey = "nhyapu.chat-cache.local";
+  undoCacheKey = "nhyapu.undo-cache.local";
+  aiKeyPrefix = "nhyapu.ai-key.local.";
   applySettingsToForm();
   await loadLayouts();
   await loadResumes();
