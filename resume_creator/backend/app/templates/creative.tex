@@ -1,6 +1,7 @@
 \documentclass[\VAR{font_size},\VAR{paper_size}]{article}
 \usepackage[margin=\VAR{margin}]{geometry}
 \usepackage{enumitem}
+\usepackage{multicol}
 \usepackage[hidelinks]{hyperref}
 \usepackage{xcolor}
 \definecolor{accent}{HTML}{\VAR{accent_color}}
@@ -17,6 +18,6 @@
 \BLOCK{ if summary }\rsection{Creative Profile}\VAR{summary}\par\BLOCK{ endif }
 \BLOCK{ if projects }\rsection{Selected Work}\BLOCK{ for item in projects }{\large\bfseries \VAR{item.name}}\BLOCK{ if item.technologies }\hfill\textcolor{accent}{\VAR{item.technologies}}\BLOCK{ endif }\par\VAR{item.description}\BLOCK{ if item.github_link }\par\href{\VAR{item.github_link}}{View project}\BLOCK{ endif }\par\medskip\BLOCK{ endfor }\BLOCK{ endif }
 \BLOCK{ if experience }\rsection{Experience}\BLOCK{ for item in experience }\textbf{\VAR{item.role}} -- \VAR{item.company} \hfill \VAR{item.duration}\par\VAR{item.description}\par\smallskip\BLOCK{ endfor }\BLOCK{ endif }
-\BLOCK{ if skills }\rsection{Skills}\begin{itemize}\BLOCK{ for skill in skills }\item \VAR{skill}\BLOCK{ endfor }\end{itemize}\BLOCK{ endif }
+\BLOCK{ if skills }\rsection{Skills}\begin{multicols}{\VAR{skill_columns}}\begin{itemize}\BLOCK{ for skill in skills }\item \VAR{skill}\BLOCK{ endfor }\end{itemize}\end{multicols}\BLOCK{ endif }
 \BLOCK{ if education }\rsection{Education}\BLOCK{ for item in education }\textbf{\VAR{item.degree}} -- \VAR{item.institution} \hfill \VAR{item.graduation_year}\par\BLOCK{ endfor }\BLOCK{ endif }
 \end{document}

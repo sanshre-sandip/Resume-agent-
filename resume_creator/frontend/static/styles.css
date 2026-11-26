@@ -57,7 +57,7 @@
 .rail-file-name{width:100%;height:36px;padding:0 9px;border:1px solid #e6e3ef;border-radius:8px;background:#fff;color:#3d3e51;font:10px "DM Sans",sans-serif;outline:none}
 .rail-file-name:focus{border-color:#a48ded;box-shadow:0 0 0 3px #ede8fc}
 .rail-file-help{color:#8e8d9c;font-size:9px;line-height:1.4}
-.resume-preview-skills{margin:4px 0 0;padding-left:16px;color:#555667;font-size:9px;line-height:1.55}
+.resume-preview-skills{display:grid;grid-template-columns:repeat(var(--skill-columns,2),minmax(0,1fr));column-gap:18px;margin:4px 0 0;padding-left:16px;color:#555667;font-size:9px;line-height:1.55}
 .resume-preview-skills li{padding-left:2px;margin:1px 0;overflow-wrap:anywhere}
 .side-rail .rail-note{margin-top:auto}
 .content-grid{grid-template-columns:minmax(0,1.02fr) minmax(330px,.98fr);gap:20px}

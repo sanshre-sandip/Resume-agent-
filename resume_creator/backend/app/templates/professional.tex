@@ -1,6 +1,7 @@
 \documentclass[\VAR{font_size},\VAR{paper_size}]{article}
 \usepackage[margin=\VAR{margin}]{geometry}
 \usepackage{enumitem}
+\usepackage{multicol}
 \usepackage{titlesec}
 \usepackage[hidelinks]{hyperref}
 \usepackage{xcolor}
@@ -63,7 +64,13 @@
 
 \BLOCK{ if skills_line }
 \section{Skills}
-\VAR{skills_line}
+\begin{multicols}{\VAR{skill_columns}}
+\begin{itemize}
+\BLOCK{ for skill in skills }
+\item \VAR{skill}
+\BLOCK{ endfor }
+\end{itemize}
+\end{multicols}
 \BLOCK{ endif }
 
 \BLOCK{ if certificates }

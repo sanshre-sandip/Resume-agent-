@@ -89,6 +89,7 @@ def build_context(
     else:
         skills = [str(skill).strip().lstrip("*•·- ") for skill in skills if str(skill).strip()]
     skills_line = ", ".join(skills)
+    skill_columns = min(3, max(2, (len(skills) + 11) // 12))
 
     return {
         "header": header,
@@ -98,6 +99,7 @@ def build_context(
         "education": structured.get("education") or [],
         "skills_line": skills_line,
         "skills": skills,
+        "skill_columns": skill_columns,
         "certificates": structured.get("certificates") or [],
         "awards": structured.get("awards") or [],
         "languages": structured.get("languages") or [],

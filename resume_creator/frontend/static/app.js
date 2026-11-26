@@ -376,6 +376,7 @@ function refreshPreview(resume = currentResume) {
     heading.textContent = templateName === "research" ? "Technical Skills & Methods" : templateName === "developer" ? "Technical Skills" : "Skills";
     const list = document.createElement("ul");
     list.className = "resume-preview-skills";
+    list.style.setProperty("--skill-columns", String(Math.min(3, Math.max(2, Math.ceil(parseSkillItems(skillsText).length / 12)))));
     parseSkillItems(skillsText).forEach((skill) => {
       const item = document.createElement("li");
       item.textContent = skill;
