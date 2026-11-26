@@ -1,1 +1,25 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Privacy — Nhyapu Craft</title><link rel="stylesheet" href="/assets/auth.css"/></head><body><main class="auth-shell"><a class="auth-brand" href="/"><span class="brand-mark">N</span><span>Nhyapu <b>Craft</b></span></a><article class="auth-card policy-card"><span class="eyebrow">PRIVACY INFORMATION</span><h1>How Nhyapu Craft handles data</h1><p>This page describes the current Phase 1 implementation. The operator should review and publish jurisdiction-specific privacy terms before public launch.</p><h2>Account and resume data</h2><p>The app stores an account email, display name, password hash, and saved resume information in its configured persistent storage. Passwords are not stored as plain text. Resume access is restricted by account ownership checks on the server.</p><h2>AI features</h2><p>Creating, editing, saving, previewing, and exporting a resume work without AI. If you enter a provider key, it is held in this browser tab’s session storage and sent to this app’s backend only for a connection test or AI action. The app does not save the key in account files or resume data. For an AI action, the relevant resume content and key are forwarded to your selected provider. Provider keys may incur charges. Review that provider’s terms and privacy information before use. If you are under 18, get parent or guardian permission before sending information to an AI provider or using a provider key.</p><h2>Cookies and browser storage</h2><p>The app uses an HTTP-only session cookie and a CSRF token cookie for sign-in and request protection. The layout assistant may keep chat and undo history in this browser. Those browser caches are separate from your saved resume records. Provider keys stay in tab-scoped session storage and are cleared when the tab closes.</p><h2>Deletion</h2><p>Account settings includes an action to delete your account, resumes, saved layout suggestions, and generated documents from the app’s active storage. Backups, if configured by the operator, may have a separate retention period.</p><h2>Contact</h2><p>For questions about data stored by a deployment, contact that deployment’s operator.</p><a class="policy-back" href="/">Back to Nhyapu Craft</a></article><footer>NHYAPU CRAFT <span>·</span> Privacy information</footer></main></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy — Nhyapu Craft</title>
+    <link rel="stylesheet" href="/assets/auth.css" />
+  </head>
+  <body>
+    <main class="auth-shell">
+      <a class="auth-brand" href="/"><span class="brand-mark">N</span><span>Nhyapu <b>Craft</b></span></a>
+      <article class="auth-card policy-card">
+        <span class="eyebrow">LOCAL APP</span>
+        <h1>Privacy information</h1>
+        <p>Nhyapu Craft runs on the computer where you start it. Resume records are stored in the configured local data folder, and generated documents are stored in the configured output folder. Anyone with access to that computer or those folders may be able to access the files.</p>
+        <h2>Optional AI features</h2>
+        <p>Manual editing, saving, previewing, and exporting do not require AI. If you choose an AI feature, the resume content needed for that request is sent to the AI provider selected in settings. Review the provider’s privacy terms before using it.</p>
+        <h2>Browser storage</h2>
+        <p>The browser may keep assistant history and preferences for this local workspace. You can clear those browser storage entries in your browser settings.</p>
+        <a class="policy-back" href="/">Back to the resume workspace</a>
+      </article>
+      <footer>NHYAPU CRAFT <span>·</span> Local privacy information</footer>
+    </main>
+  </body>
+</html>
