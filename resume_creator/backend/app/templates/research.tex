@@ -1,0 +1,44 @@
+\documentclass[\VAR{font_size},\VAR{paper_size}]{article}
+\usepackage[margin=\VAR{margin}]{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\definecolor{accent}{HTML}{\VAR{accent_color}}
+\setlist[itemize]{leftmargin=1.2em,topsep=2pt,itemsep=1pt}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\newcommand{\rsection}[1]{\bigskip{\large\bfseries\color{accent} #1}\par\hrule\smallskip}
+\begin{document}
+{\LARGE\bfseries \VAR{header.full_name}}\par
+\BLOCK{ if header.title }\textcolor{accent}{\VAR{header.title}}\par\BLOCK{ endif }
+\small \VAR{header.email}\BLOCK{ if header.phone } | \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.public_links } | \BLOCK{ for link in header.public_links }\href{\VAR{link.url}}{\VAR{link.label}: \VAR{link.url}}\BLOCK{ if not loop.last } | \BLOCK{ endif }\BLOCK{ endfor }\BLOCK{ endif }\par\normalsize
+\BLOCK{ if summary }\rsection{Research Profile}\VAR{summary}\par\BLOCK{ endif }
+\BLOCK{ if education }\rsection{Education}\BLOCK{ for item in education }\textbf{\VAR{item.degree}} -- \VAR{item.institution} \hfill \VAR{item.graduation_year}\par\BLOCK{ endfor }\BLOCK{ endif }
+\BLOCK{ if projects }\rsection{Research and AI/ML Projects}\BLOCK{ for item in projects }\textbf{\VAR{item.name}}\BLOCK{ if item.technologies } -- \VAR{item.technologies}\BLOCK{ endif }\par\VAR{item.description}\par\smallskip\BLOCK{ endfor }\BLOCK{ endif }
+\BLOCK{ if experience }\rsection{Research Experience}\BLOCK{ for item in experience }\textbf{\VAR{item.role}} -- \VAR{item.company} \hfill \VAR{item.duration}\par\VAR{item.description}\par\smallskip\BLOCK{ endfor }\BLOCK{ endif }
+\BLOCK{ if skills }\rsection{Technical Skills and Methods}\begin{itemize}\BLOCK{ for skill in skills }\item \VAR{skill}\BLOCK{ endfor }\end{itemize}\BLOCK{ endif }
+\BLOCK{ if certificates }\rsection{Certifications and Awards}\BLOCK{ for item in certificates }\VAR{item.name}\BLOCK{ if item.issuer } -- \VAR{item.issuer}\BLOCK{ endif }\par\BLOCK{ endfor }\BLOCK{ endif }
+\BLOCK{ if publications }
+\section{Publications}
+\BLOCK{ for item in publications }
+\textbf{\VAR{item.title}}\BLOCK{ if item.venue } \textemdash{} \VAR{item.venue}\BLOCK{ endif }\BLOCK{ if item.date } \hfill \VAR{item.date}\BLOCK{ endif }\par
+\BLOCK{ if item.description }\VAR{item.description}\par\BLOCK{ endif }
+\BLOCK{ if item.url }\href{\VAR{item.url}}{Publication link}\par\BLOCK{ endif }
+\BLOCK{ endfor }
+\BLOCK{ endif }
+\BLOCK{ if awards }
+\section{Awards}
+\BLOCK{ for item in awards }
+\textbf{\VAR{item.name}}\BLOCK{ if item.issuer } \textemdash{} \VAR{item.issuer}\BLOCK{ endif }\BLOCK{ if item.date } \hfill \VAR{item.date}\BLOCK{ endif }\par
+\BLOCK{ if item.description }\VAR{item.description}\par\BLOCK{ endif }
+\BLOCK{ endfor }
+\BLOCK{ endif }
+\BLOCK{ if languages }
+\section{Languages}
+\begin{itemize}
+\BLOCK{ for item in languages }\item \VAR{item.name}\BLOCK{ if item.proficiency } \textemdash{} \VAR{item.proficiency}\BLOCK{ endif }
+\BLOCK{ endfor }
+\end{itemize}
+\BLOCK{ endif }
+
+\end{document}

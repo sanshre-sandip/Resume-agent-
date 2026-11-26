@@ -1,0 +1,22 @@
+\documentclass[\VAR{font_size},\VAR{paper_size}]{article}
+\usepackage[margin=\VAR{margin}]{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\definecolor{accent}{HTML}{\VAR{accent_color}}
+\setlist[itemize]{leftmargin=1.2em,topsep=2pt,itemsep=1pt}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\newcommand{\rsection}[1]{{\large\bfseries\color{accent} #1}\par\vspace{2pt}\hrule\vspace{5pt}}
+\begin{document}
+\BLOCK{ if header_alignment == "center" }\begin{center}\BLOCK{ endif }
+\BLOCK{ if show_logo == "yes" and logo_initials }\fcolorbox{accent}{accent}{\textcolor{white}{\bfseries \VAR{logo_initials}}}\hspace{0.5em}\BLOCK{ endif }{\Huge\bfseries\color{accent} \VAR{header.full_name}}\par
+\BLOCK{ if header.title }{\large \VAR{header.title}}\par\BLOCK{ endif }
+\small \VAR{header.email}\BLOCK{ if header.phone } | \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.public_links } | \BLOCK{ for link in header.public_links }\href{\VAR{link.url}}{\VAR{link.label}: \VAR{link.url}}\BLOCK{ if not loop.last } | \BLOCK{ endif }\BLOCK{ endfor }\BLOCK{ endif }\par\normalsize
+\BLOCK{ if header_alignment == "center" }\end{center}\BLOCK{ endif }
+\BLOCK{ if summary }\rsection{Creative Profile}\VAR{summary}\par\BLOCK{ endif }
+\BLOCK{ if projects }\rsection{Selected Work}\BLOCK{ for item in projects }{\large\bfseries \VAR{item.name}}\BLOCK{ if item.technologies }\hfill\textcolor{accent}{\VAR{item.technologies}}\BLOCK{ endif }\par\VAR{item.description}\BLOCK{ if item.github_link }\par\href{\VAR{item.github_link}}{View project}\BLOCK{ endif }\par\medskip\BLOCK{ endfor }\BLOCK{ endif }
+\BLOCK{ if experience }\rsection{Experience}\BLOCK{ for item in experience }\textbf{\VAR{item.role}} -- \VAR{item.company} \hfill \VAR{item.duration}\par\VAR{item.description}\par\smallskip\BLOCK{ endfor }\BLOCK{ endif }
+\BLOCK{ if skills }\rsection{Skills}\begin{itemize}\BLOCK{ for skill in skills }\item \VAR{skill}\BLOCK{ endfor }\end{itemize}\BLOCK{ endif }
+\BLOCK{ if education }\rsection{Education}\BLOCK{ for item in education }\textbf{\VAR{item.degree}} -- \VAR{item.institution} \hfill \VAR{item.graduation_year}\par\BLOCK{ endfor }\BLOCK{ endif }
+\end{document}

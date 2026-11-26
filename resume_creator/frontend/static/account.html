@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f4f5f2" />
+    <meta name="description" content="Manage your Nhyapu Craft account and saved resume data." />
+    <title>Account — Nhyapu Craft</title>
+    <link rel="stylesheet" href="/assets/account.css" />
+    <script src="/assets/security.js" defer></script>
+    <script src="/assets/account.js" defer></script>
+  </head>
+  <body class="account-page">
+    <header class="account-topbar">
+      <a class="account-brand" href="/" aria-label="Nhyapu Craft home"><span class="account-brand-mark">N</span><span>NHYAPU <b>CRAFT</b></span></a>
+      <a class="back-workspace" href="/workspace"><span aria-hidden="true">←</span> Back to workspace</a>
+    </header>
+
+    <main class="account-layout">
+      <div class="account-heading">
+        <span class="account-eyebrow">ACCOUNT SETTINGS</span>
+        <h1>Your account</h1>
+        <p>Manage your sign-in details and the resume data connected to this account.</p>
+      </div>
+
+      <div class="account-grid">
+        <aside class="account-identity-card" aria-label="Account summary">
+          <div class="account-avatar" id="account-avatar" aria-hidden="true">N</div>
+          <h2 id="account-name">Loading account…</h2>
+          <p id="account-email">—</p>
+          <span class="account-status"><i></i> Private account</span>
+          <div class="identity-divider"></div>
+          <span class="account-label">MEMBER SINCE</span>
+          <strong id="account-created">—</strong>
+          <a class="manage-resumes" href="/workspace">Manage my resumes <span aria-hidden="true">↗</span></a>
+        </aside>
+
+        <div class="account-content">
+          <section class="account-panel" aria-labelledby="profile-title">
+            <div class="panel-heading"><div class="panel-icon" aria-hidden="true">01</div><div><h2 id="profile-title">Profile details</h2><p>Your account identity used to sign in.</p></div></div>
+            <dl class="profile-fields">
+              <div><dt>Display name</dt><dd id="profile-name">Loading…</dd></div>
+              <div><dt>Email address</dt><dd id="profile-email">Loading…</dd></div>
+            </dl>
+          </section>
+
+          <section class="account-panel" aria-labelledby="security-title">
+            <div class="panel-heading"><div class="panel-icon" aria-hidden="true">02</div><div><h2 id="security-title">Sign-in & security</h2><p>Your session stays private to this browser.</p></div></div>
+            <div class="session-row"><div><strong>Current session</strong><span>Sign out when you finish on a shared device.</span></div><button class="secondary-action" id="logout-button" type="button">Sign out</button></div>
+          </section>
+
+          <section class="account-panel data-panel" aria-labelledby="data-title">
+            <div class="panel-heading"><div class="panel-icon" aria-hidden="true">03</div><div><h2 id="data-title">Resume data</h2><p>Delete your account and its saved content from active storage.</p></div></div>
+            <div class="delete-row"><div><strong>Delete account and resumes</strong><span>This removes your saved resumes, layout suggestions, and generated documents. This action can’t be undone.</span></div><button class="danger-action" id="delete-account" type="button">Delete account</button></div>
+          </section>
+
+          <p class="account-message" id="account-message" role="status" aria-live="polite"></p>
+          <p class="account-privacy">Learn how saved information is handled in the <a href="/privacy">privacy information</a>.</p>
+        </div>
+      </div>
+    </main>
+
+    <dialog class="delete-dialog" id="delete-dialog" aria-labelledby="delete-dialog-title">
+      <div class="delete-dialog-icon" aria-hidden="true">!</div>
+      <h2 id="delete-dialog-title">Delete your account?</h2>
+      <p>Your account, saved resumes, and generated files will be removed from active storage. This can’t be undone.</p>
+      <div class="delete-dialog-actions"><button type="button" class="secondary-action" id="cancel-delete">Keep my account</button><button type="button" class="danger-action" id="confirm-delete">Delete everything</button></div>
+    </dialog>
+
+    <footer class="account-footer"><span>NHYAPU CRAFT</span><span>Craft Your Career. Create Your Future.</span><a href="/terms">Service information</a></footer>
+  </body>
+</html>
