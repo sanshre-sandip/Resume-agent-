@@ -25,10 +25,10 @@
 
 \BLOCK{ if header_alignment == "center" }\begin{center}\BLOCK{ else }
 \begin{flushleft}\BLOCK{ endif }
-{\LARGE\bfseries \VAR{header.full_name}}\\[2pt]
+\BLOCK{ if show_logo == "yes" and logo_initials }\fcolorbox{accent}{accent}{\textcolor{white}{\bfseries \VAR{logo_initials}}}\hspace{0.5em}\BLOCK{ endif }{\LARGE\bfseries \VAR{header.full_name}}\\[2pt]
 \BLOCK{ if header.title }\VAR{header.title}\\[2pt]\BLOCK{ endif }
-\small \VAR{header.email}\BLOCK{ if header.phone } $\cdot$ \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.address } $\cdot$ \VAR{header.address}\BLOCK{ endif }\\
-\BLOCK{ if header.linkedin }\href{\VAR{header.linkedin}}{LinkedIn}\BLOCK{ endif }\BLOCK{ if header.github } $\cdot$ \href{\VAR{header.github}}{GitHub}\BLOCK{ endif }\BLOCK{ if header.portfolio } $\cdot$ \href{\VAR{header.portfolio}}{Portfolio}\BLOCK{ endif }
+\small \VAR{header.email}\BLOCK{ if header.phone } $\cdot$ \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.address } $\cdot$ \VAR{header.address}\BLOCK{ endif }\BLOCK{ if contact_layout == "separate" or not header.public_links }\\\BLOCK{ endif }
+\BLOCK{ for link in header.public_links }\BLOCK{ if loop.first and contact_layout == "inline" or not loop.first } $\cdot$ \BLOCK{ endif }\href{\VAR{link.url}}{\VAR{link.label}: \VAR{link.url}}\BLOCK{ endfor }\BLOCK{ if header.public_links }\\\BLOCK{ endif }
 \BLOCK{ if header_alignment == "center" }\end{center}\BLOCK{ else }\end{flushleft}\BLOCK{ endif }
 
 \BLOCK{ if summary }

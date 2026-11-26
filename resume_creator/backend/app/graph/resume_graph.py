@@ -67,6 +67,8 @@ async def optimize_node(state: ResumeState) -> ResumeState:
 async def structure_node(state: ResumeState) -> ResumeState:
     llm = get_llm_provider(state["input"]["ai_config"])
     structured = await run_structuring_agent(llm=llm, optimized_resume=state.get("optimized_resume", {}), user_profile=state["payload"] or {})
+    if state["input"].get("summary"):
+        structured["summary"] = state["input"]["summary"]
     state["structured_data"] = structured
     state.setdefault("logs", []).append("structured")
     return state
@@ -83,6 +85,8 @@ async def render_node(state: ResumeState) -> ResumeState:
     for key in ("full_name", "email", "phone", "address", "linkedin", "github", "portfolio"):
         if not header.get(key) and personal.get(key):
             header[key] = personal[key]
+    if personal.get("links"):
+        header["links"] = [link.model_dump() if hasattr(link, "model_dump") else link for link in personal["links"]]
     structured["header"] = header
 
     renderer = LaTeXRenderer(template_dir=settings.template_dir)
@@ -102,6 +106,9 @@ async def export_node(state: ResumeState) -> ResumeState:
         resume_id=state["input"]["resume_id"],
         generated_dir=settings.generated_dir,
         timestamp=ts,
+        structured_data=state.get("structured_data") or {},
+        style=state["input"].get("style"),
+        template_name=state["input"].get("template_name", "modern"),
     )
     state["pdf_path"] = artifacts.get("pdf_path")
     state["docx_path"] = artifacts.get("docx_path")

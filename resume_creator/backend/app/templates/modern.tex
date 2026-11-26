@@ -28,11 +28,11 @@
 \begin{document}
 
 \BLOCK{ if header_alignment == "center" }\begin{center}\BLOCK{ endif }
-{\Huge\bfseries \VAR{header.full_name}}\\[2pt]
+\BLOCK{ if show_logo == "yes" and logo_initials }\fcolorbox{accent}{accent}{\textcolor{white}{\bfseries \VAR{logo_initials}}}\hspace{0.5em}\BLOCK{ endif }{\Huge\bfseries \VAR{header.full_name}}\\[2pt]
 \BLOCK{ if header.title }{\large\color{accent}\VAR{header.title}}\\[4pt]\BLOCK{ endif }
 \small
-\VAR{header.email}\BLOCK{ if header.phone } \textbar{} \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.address } \textbar{} \VAR{header.address}\BLOCK{ endif }\\
-\BLOCK{ if header.linkedin }\href{\VAR{header.linkedin}}{LinkedIn}\BLOCK{ endif }\BLOCK{ if header.github } \textbar{} \href{\VAR{header.github}}{GitHub}\BLOCK{ endif }\BLOCK{ if header.portfolio } \textbar{} \href{\VAR{header.portfolio}}{Portfolio}\BLOCK{ endif }
+\VAR{header.email}\BLOCK{ if header.phone } \textbar{} \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.address } \textbar{} \VAR{header.address}\BLOCK{ endif }\BLOCK{ if contact_layout == "separate" or not header.public_links }\\\BLOCK{ endif }
+\BLOCK{ for link in header.public_links }\BLOCK{ if loop.first and contact_layout == "inline" or not loop.first } \textbar{} \BLOCK{ endif }\href{\VAR{link.url}}{\VAR{link.label}: \VAR{link.url}}\BLOCK{ endfor }\BLOCK{ if header.public_links }\\\BLOCK{ endif }
 \BLOCK{ if header_alignment == "center" }\end{center}\BLOCK{ endif }
 
 \BLOCK{ if summary }
@@ -65,9 +65,13 @@
 \BLOCK{ endfor }
 \BLOCK{ endif }
 
-\BLOCK{ if skills_line }
+\BLOCK{ if skills }
 \section{Skills}
-\VAR{skills_line}
+\begin{itemize}
+\BLOCK{ for skill in skills }
+\item \VAR{skill}
+\BLOCK{ endfor }
+\end{itemize}
 \BLOCK{ endif }
 
 \BLOCK{ if certificates }
@@ -75,6 +79,29 @@
 \begin{itemize}
 \BLOCK{ for item in certificates }
 \item \VAR{item.name}\BLOCK{ if item.issuer } \textemdash{} \VAR{item.issuer}\BLOCK{ endif }
+\BLOCK{ endfor }
+\end{itemize}
+\BLOCK{ endif }
+
+\BLOCK{ if publications }
+\section{Publications}
+\BLOCK{ for item in publications }
+\textbf{\VAR{item.title}}\BLOCK{ if item.venue } \textemdash{} \VAR{item.venue}\BLOCK{ endif }\BLOCK{ if item.date } \hfill \VAR{item.date}\BLOCK{ endif }\par
+\BLOCK{ if item.description }\VAR{item.description}\par\BLOCK{ endif }
+\BLOCK{ if item.url }\href{\VAR{item.url}}{Publication link}\par\BLOCK{ endif }
+\BLOCK{ endfor }
+\BLOCK{ endif }
+\BLOCK{ if awards }
+\section{Awards}
+\BLOCK{ for item in awards }
+\textbf{\VAR{item.name}}\BLOCK{ if item.issuer } \textemdash{} \VAR{item.issuer}\BLOCK{ endif }\BLOCK{ if item.date } \hfill \VAR{item.date}\BLOCK{ endif }\par
+\BLOCK{ if item.description }\VAR{item.description}\par\BLOCK{ endif }
+\BLOCK{ endfor }
+\BLOCK{ endif }
+\BLOCK{ if languages }
+\section{Languages}
+\begin{itemize}
+\BLOCK{ for item in languages }\item \VAR{item.name}\BLOCK{ if item.proficiency } \textemdash{} \VAR{item.proficiency}\BLOCK{ endif }
 \BLOCK{ endfor }
 \end{itemize}
 \BLOCK{ endif }

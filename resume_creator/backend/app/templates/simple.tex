@@ -20,9 +20,10 @@
 \begin{document}
 
 \BLOCK{ if header_alignment == "center" }\begin{center}\BLOCK{ else }\begin{flushleft}\BLOCK{ endif }
-{\LARGE\bfseries \VAR{header.full_name}}\par
+\BLOCK{ if show_logo == "yes" and logo_initials }\fcolorbox{accent}{accent}{\textcolor{white}{\bfseries \VAR{logo_initials}}}\hspace{0.5em}\BLOCK{ endif }{\LARGE\bfseries \VAR{header.full_name}}\par
 \BLOCK{ if header.title }\VAR{header.title}\par\BLOCK{ endif }
-\VAR{header.email}\BLOCK{ if header.phone } | \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.address } | \VAR{header.address}\BLOCK{ endif }\par
+\VAR{header.email}\BLOCK{ if header.phone } | \VAR{header.phone}\BLOCK{ endif }\BLOCK{ if header.address } | \VAR{header.address}\BLOCK{ endif }\BLOCK{ if contact_layout == "separate" or not header.public_links }\par\BLOCK{ endif }
+\BLOCK{ for link in header.public_links }\BLOCK{ if loop.first and contact_layout == "inline" or not loop.first } | \BLOCK{ endif }\href{\VAR{link.url}}{\VAR{link.label}: \VAR{link.url}}\BLOCK{ endfor }\BLOCK{ if header.public_links }\par\BLOCK{ endif }
 \BLOCK{ if header_alignment == "center" }\end{center}\BLOCK{ else }\end{flushleft}\BLOCK{ endif }
 
 \BLOCK{ if summary }

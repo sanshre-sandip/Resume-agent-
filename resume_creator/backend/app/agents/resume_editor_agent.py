@@ -12,27 +12,29 @@ Never invent jobs, dates, education, skills, numbers, or achievements. Ask a sho
 when a requested factual change needs information the user has not provided. If the request is
 only a question, answer it and leave the resume unchanged.
 
-You may choose only these templates: modern, professional, simple.
+You may choose only these templates: ats, modern, student, developer, research.
 Allowed style values:
-- accent_color: 1F6FEB, 6F42C1, 0F766E, B45309, 1F2937, BE123C
+- accent_color: any six-digit hex color, without # (for example, 15B8A6)
 - font_size: 10pt, 11pt, 12pt
 - paper_size: a4paper, letterpaper
 - margin: 1.4cm, 1.8cm, 2cm
 - header_alignment: left, center
 - section_style: accent-rule, uppercase-rule, minimal
 - spacing: compact, balanced, airy
+- show_logo: yes or no. A logo is a small monogram made from the resume owner's initials.
+- contact_layout: inline or separate. Inline places email, phone, location, and every link on one line.
 
 Return ONLY one JSON object with keys:
 reply (string),
 structured_data (the complete updated resume JSON with header, summary, experience, projects,
-education, skills, certificates),
+education, skills, certificates, awards, languages, and publications),
 template_name (one allowed template),
-style (object containing all seven allowed style settings).
+style (object containing the allowed style settings, including accent_color, show_logo, and contact_layout).
 layouts (an array of zero to three new layout suggestions, each with name, description,
 template_name, and style. When the user asks for more layout ideas, return two or three
 distinct suggestions and leave the current resume content and layout unchanged. Otherwise return
 an empty array.)
-Preserve every field the user did not ask to change. Output no markdown or text outside JSON."""
+Treat formatting requests such as "put my links on one line" as clear instructions: use contact_layout inline, keep every existing link, and do not ask whether another link should be removed. Preserve every field the user did not ask to change. Output no markdown or text outside JSON."""
 
 
 def edit_resume(
@@ -65,10 +67,16 @@ def edit_resume(
     result = json.loads(match.group(0))
     if not isinstance(result.get("structured_data"), dict):
         result["structured_data"] = structured_data
-    if result.get("template_name") not in {"modern", "professional", "simple"}:
+    else:
+        for key in ("awards", "languages", "publications"):
+            if key not in result["structured_data"]:
+                result["structured_data"][key] = structured_data.get(key, [])
+    if result.get("template_name") not in {"ats", "modern", "student", "developer", "research"}:
         result["template_name"] = template_name
     if not isinstance(result.get("style"), dict):
         result["style"] = style
+    else:
+        result["style"] = {**style, **result["style"]}
     if not isinstance(result.get("layouts"), list):
         result["layouts"] = []
     result["layouts"] = [item for item in result["layouts"][:3] if isinstance(item, dict)]

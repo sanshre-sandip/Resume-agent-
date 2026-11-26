@@ -1,210 +1,100 @@
-# AI Resume Creator
+# Nhyapu Craft
 
-AI-powered single-person resume workspace built with FastAPI, LangGraph, LangChain, a responsive HTML/CSS/JavaScript interface, and local JSON file storage.
+Nhyapu Craft is a private, account-based resume builder. The Phase 1 app uses FastAPI and a responsive HTML/CSS/JavaScript frontend. Manual editing and resume export do not require an AI provider. It supports five templates, multiple resumes per account, live preview, PDF preview/download, and Word export when the host has the required document renderer.
 
-## Architecture
+## Current architecture
 
-Web UI -> FastAPI -> LangGraph Workflow -> Local JSON files
-
-### LangGraph Nodes
-1. User Profile Validation
-2. Role context retrieval for resume tailoring
-3. Resume Optimization
-4. Resume Structuring
-5. LaTeX Rendering
-6. Export (PDF/DOCX)
-
-### Data Flow Diagram
-
-```mermaid
-flowchart TD
-    subgraph Frontend["Web Frontend"]
-        FORM[User Form Fields]
-        SUBMIT[POST /api/resume/create]
-    end
-
-    subgraph FastAPI["FastAPI Backend"]
-        ROUTER[Router<br/>resumes.py]
-        VALIDATE[Pydantic Validation<br/>CreateResumeRequest]
-    end
-
-    subgraph Graph["LangGraph Workflow"]
-        N1[Node 1: Validate<br/>validate_node]
-        N2[Node 2: Research<br/>research_node]
-        N3[Node 3: Optimize<br/>optimize_node]
-        N4[Node 4: Structure<br/>structure_node]
-        N5[Node 5: Render<br/>render_node]
-        N6[Node 6: Export<br/>export_node]
-    end
-
-    subgraph Agents["Agent Layer"]
-        RA[Research Agent]
-        OA[Optimization Agent]
-        SA[Structuring Agent]
-        RDA[LaTeX Renderer]
-        EA[Export Agent]
-    end
-
-    subgraph LLM["LLM Providers"]
-        LLMF[llm_providers.py<br/>OpenAI | Anthropic | Google | Groq | Ollama | OpenRouter]
-    end
-
-    subgraph Services["Services"]
-        RS[Research Service]
-        RSCache[(Local JSON cache)]
-    end
-
-    subgraph Storage["Storage"]
-        DB[(JSON files<br/>users, resumes, research cache)]
-        TEX[.tex Template]
-        FS[Generated Files<br/>.tex / .pdf / .docx]
-    end
-
-    subgraph Response["Response"]
-        OUT[ResumeDetailResponse<br/>structured_data, latex, pdf, docx]
-        DL[Download Buttons<br/>Web UI]
-    end
-
-    FORM --> SUBMIT --> ROUTER
-    ROUTER --> VALIDATE
-    ROUTER --> DB
-    VALIDATE --> N1 --> N2 --> N3 --> N4 --> N5 --> N6
-
-    N2 --> RA --> LLMF
-    N2 --> RS --> RSCache
-
-    N3 --> OA --> LLMF
-    N4 --> SA --> LLMF
-    N5 --> RDA --> TEX
-    N6 --> EA --> FS
-
-    N6 --> ROUTER
-    ROUTER --> DB
-    ROUTER --> OUT --> DL
+```text
+Browser (same-origin UI)
+  ├── Public landing page and authentication screens
+  └── Authenticated workspace
+        ├── Editor, template preview, autosave, chat cache
+        └── FastAPI JSON API
+              ├── Signed session + CSRF checks
+              ├── Per-user resume/layout ownership checks
+              ├── Atomic JSON record files in DATA_DIR
+              └── Private generated .tex/.docx/.pdf in GENERATED_DIR
 ```
 
-## Project Structure
+The project intentionally retains file-based storage. On Linux, collection writes use a process lock and atomic replacement. This is suitable for local development or a single application host with persistent disks and backups. It is not a horizontally scalable database: keep a single application instance for writes, mount persistent storage, and back it up. A hosted deployment that needs multiple application instances should migrate the data-store interface to PostgreSQL before enabling scale-out.
 
-```
-resume_creator/
-├── backend/
-│   └── app/
-│       ├── main.py              # FastAPI application
-│       ├── config.py            # Settings and environment configuration
-│       ├── database/
-│       │   └── file_store.py    # JSON file persistence
-│       ├── schemas/
-│       │   └── schemas.py       # Pydantic request/response schemas
-│       ├── routers/
-│       │   ├── resumes.py       # Resume endpoints
-│       ├── agents/
-│       │   ├── research_agent.py
-│       │   ├── optimization_agent.py
-│       │   ├── resume_editor_agent.py
-│       │   ├── structuring_agent.py
-│       │   ├── rendering_agent.py
-│       │   └── export_agent.py
-│       ├── graph/
-│       │   └── resume_graph.py  # LangGraph workflow
-│       ├── services/
-│       │   ├── research_service.py
-│       │   └── resume_service.py
-│       ├── templates/           # LaTeX templates (*.tex)
-│       └── utils/
-│           ├── llm_providers.py # OpenAI, Anthropic, Google, Groq, Ollama, OpenRouter
-│           ├── renderer.py
-│           └── latex_utils.py
-├── frontend/
-│   └── static/                  # HTML, CSS, and JavaScript UI
-├── generated/                   # Generated PDFs and DOCX
-├── uploads/                     # User uploads
-└── logs/                        # Application logs
-```
+## Local development (no Docker)
 
-## Prerequisites
-
-- Python 3.11+
-- A provider selected in the app's AI settings, or a local Ollama service
-- TeX Live (for PDF generation) or pandoc (for DOCX conversion)
-
-## Setup
-
-1. Clone the repository and navigate to the project directory:
-```bash
-cd /path/to/Resume-agent-
-```
-
-2. Create a virtual environment:
-```bash
-python3 -m venv res
-source res/bin/activate
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Create required directories:
-```bash
-mkdir -p generated uploads logs data
-```
-
-The app stores named resume files locally. Configure an AI provider in **AI settings** in the app; API keys are kept in the browser and are not written to `.env` or the app's JSON records. Cloud providers receive the resume text used for their requests and may apply their own usage charges and data policies. Ollama is available for a local provider.
-
-## Running the Application
-
-### Start the application
+Python 3.12+ is recommended. From the repository root:
 
 ```bash
-uvicorn resume_creator.backend.app.main:app --host 127.0.0.1 --port 8001 --reload
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+cp .env.example .env
+uvicorn app.main:app --app-dir resume_creator/backend --reload --host 127.0.0.1 --port 8001
 ```
 
-Open `http://127.0.0.1:8001` for the resume builder or `http://127.0.0.1:8001/docs` for the API docs.
+Open `http://127.0.0.1:8001/`, register a test account, then use the workspace. API docs are at `/docs`; `/workspace` serves the editor UI and redirects signed-out users to login in the browser.
 
-## API Endpoints
+Run automated checks:
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/resume/create` | Create a uniquely named resume file |
-| PUT | `/api/resume/{id}` | Update a named resume file |
-| GET | `/api/resumes` | List saved resume files |
-| GET | `/api/resume/{id}` | Open a saved resume file |
-| POST | `/api/resume/{id}/chat` | Edit a resume or ask for layout ideas |
-| POST | `/api/resume/{id}/apply-layout` | Apply a saved layout |
-| GET | `/api/layouts` | List built-in and AI-generated layouts |
-| POST | `/api/layouts/generate` | Ask the selected AI to create layout options |
-| POST | `/api/ai/test` | Test AI settings |
-| GET | `/api/resume/{id}/pdf` | Download PDF |
-| GET | `/api/resume/{id}/docx` | Download DOCX |
-| GET | `/api/templates` | List available templates |
+```bash
+PYTHONPATH=resume_creator/backend python -m unittest discover -s resume_creator/backend/tests -v
+node --check resume_creator/frontend/static/app.js
+node --check resume_creator/frontend/static/auth.js
+node --check resume_creator/frontend/static/account.js
+```
 
-## LLM Providers
+PDF export tries `pdflatex` first and then headless LibreOffice to convert the generated Word document. Install either renderer on the host. In restricted containers where neither renderer can write its runtime profile, PDF generation reports unavailable; Word export remains available. The PDF text should be selectable/searchable when the renderer is available.
 
-Choose a provider in **AI settings** in the app:
-- **Ollama** (local)
-- **Groq**
-- **OpenAI** (GPT-4o)
-- **Anthropic** (Claude)
-- **Google** (Gemini)
-- **OpenRouter**
+## Features in this release
 
-## LaTeX Templates
+- Landing page, FAQ, privacy and service-information pages.
+- Email/password registration and login; optional email verification and password recovery through SMTP.
+- Google OpenID Connect sign-in when credentials are configured.
+- Expiring signed session cookies, CSRF checks, auth attempt throttling, and server-side ownership checks.
+- Create, reopen, autosave, rename, duplicate, and delete multiple resumes per user.
+- Five templates: ATS-Friendly Standard, Modern Minimalist, Student & Fresh Graduate, Technical Developer, and AI/ML Research.
+- Resume sections for profile, headline, summary, skills, work, education, projects, certifications, awards, languages, and extra links.
+- A4 and US Letter sizing, live preview, PDF preview/download, and Word export when the renderer is available.
+- AI assistance is optional. Users can enter their own provider key in AI Settings; it stays in that browser tab's session storage and is sent to the app only for an AI action. It is excluded from resume data and persistent account files. Server-configured provider keys remain supported as a fallback.
 
-Place `.tex` templates in `resume_creator/backend/app/templates/`:
-- `modern.tex`
-- `professional.tex`
-- `simple.tex`
+The UI includes a layout/chat assistant. Cloud AI operations require a user-entered key or a server-configured provider. No AI feature is needed to manually create, edit, save, preview, or export a resume. Users must review AI suggestions; the assistant is instructed not to invent qualifications or achievements.
 
-## Tech Stack
+## Environment configuration
 
-- **Frontend**: Responsive HTML, CSS, and JavaScript
-- **Backend**: FastAPI
-- **Agent Framework**: LangChain, LangGraph
-- **Storage**: Local JSON files in `data/`
-- **LLM**: Provider settings in the app (OpenAI, Gemini, Claude, Groq, Ollama, OpenRouter)
-- **Rendering**: Jinja2, LaTeX, pdflatex, Pandoc
+Copy `.env.example` to `.env` for local use. The example contains placeholders only. For production, set a randomly generated `SESSION_SECRET` of at least 32 characters, `APP_ENV=production`, and the public URL. Do not commit `.env` or place provider secrets in frontend code.
 
-## License
+- Email verification and password recovery use Brevo SMTP (`smtp-relay.brevo.com:587` with STARTTLS). Configure `SMTP_USERNAME` with the SMTP login shown by Brevo, `SMTP_PASSWORD` with the Brevo SMTP key (not its API key), and `SMTP_FROM_EMAIL` with a verified sender. Keep `REQUIRE_EMAIL_VERIFICATION=true` for production after these values are set; registration fails safely if verification is required but email delivery is not configured.
+- Google OAuth needs a Google OAuth web client. Set the exact callback to `https://craft.nhyapu.space/api/auth/google/callback` in the provider console and in `GOOGLE_REDIRECT_URI`.
+- Server-side AI provider secrets are optional fallbacks: OpenAI, Anthropic, Google AI, OpenRouter, or Groq. Users can instead provide their own key in AI Settings. Ollama can point to a local service. A cloud AI edit sends the selected resume text to that provider after the user requests the edit and confirms the disclosure.
+- `DATA_DIR` and `GENERATED_DIR` must point to persistent, private storage. `GENERATED_DIR` contains private resume artifacts. Restrict file permissions and back up both locations.
 
-MIT
+## Deployment at craft.nhyapu.space (single-host, no Docker)
+
+1. Provision a Linux VM or platform that supports FastAPI/Uvicorn, persistent disk, and the chosen PDF renderer. Create a dedicated unprivileged service account.
+2. Install Python and project requirements. Install `pdflatex` or LibreOffice on that host if PDF generation is required. LibreOffice must be able to create a headless user profile and write in the generated directory.
+3. Create a persistent data volume outside the checkout. Set `DATA_DIR` and `GENERATED_DIR` to directories on it, owned by the service account. Use private permissions (for example, directory mode `0700`). Example service and Caddy reverse-proxy configuration are in `deploy/`.
+4. Create a production `.env` from `.env.example`, set a strong `SESSION_SECRET`, `APP_ENV=production`, `PUBLIC_BASE_URL=https://craft.nhyapu.space`, CORS origin, OAuth callback, and SMTP values. Add provider keys only if the AI assistant will be enabled.
+5. Run Uvicorn behind a TLS-terminating reverse proxy such as Caddy. The sample Caddyfile obtains TLS automatically. Route `craft.nhyapu.space` to the FastAPI process, preserve the `Host` header, enforce HTTPS, and configure trusted proxy handling if applicable. Do not expose the Uvicorn port publicly.
+6. Point the domain DNS record to the host and provision an HTTPS certificate before allowing sign-in. The session cookie is marked Secure in production.
+7. Start with one Uvicorn worker while using JSON files. Configure a system service/supervisor for restart-on-failure. Check `/health` after deployment.
+8. Schedule encrypted backups of `DATA_DIR` and `GENERATED_DIR`, test restore procedures, and define how long backup copies remain after account deletion.
+
+There is no database migration step in the current file-storage implementation. Do not run multiple independent app instances against separate local disks: users would see different data. This deployment target has not been deployed or DNS-verified by this repository task.
+
+## Security and data notes
+
+- Resume IDs are identifiers, not authorization. API methods check the authenticated owner before read, write, delete, and export.
+- The server does not return internal file paths for download; artifact paths are constrained to the owner's generated directory.
+- Resume content and credentials are not intentionally logged. Keep application and proxy logs access-controlled.
+- Browser local storage is used for layout-assistant conversation/undo cache and AI model preferences. User-entered provider keys are held separately in tab-scoped session storage and are not included in the authoritative resume record.
+- Account deletion removes the account, resume/layout records, and that account's generated files from active storage. Operator backups may persist until their documented expiry.
+- `privacy.html` and `terms.html` are implementation summaries and need jurisdiction-specific review before public launch.
+
+## Useful routes
+
+| Route | Purpose |
+| --- | --- |
+| `/` | Public landing page |
+| `/register`, `/login` | Authentication UI |
+| `/workspace` | Protected resume workspace UI |
+| `/account` | Account settings and deletion |
+| `/health` | Basic health check |
+| `/docs` | FastAPI API documentation |

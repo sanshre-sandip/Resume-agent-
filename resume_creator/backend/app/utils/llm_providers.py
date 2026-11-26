@@ -2,6 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from ..config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -91,13 +92,22 @@ def get_llm_provider(user_config: Any) -> LLMProvider:
     if hasattr(user_config, "model_dump"):
         user_config = user_config.model_dump()
     provider_name = str(user_config.get("provider", "openai")).lower()
-    api_key = str(user_config.get("api_key", ""))
+    api_keys = {
+        "openai": settings.openai_api_key,
+        "anthropic": settings.anthropic_api_key,
+        "google": settings.google_ai_api_key,
+        "openrouter": settings.openrouter_api_key,
+        "groq": settings.groq_api_key,
+    }
+    submitted_key = user_config.get("api_key")
+    if hasattr(submitted_key, "get_secret_value"):
+        submitted_key = submitted_key.get_secret_value()
+    api_key = (str(submitted_key).strip() if submitted_key else "") or api_keys.get(provider_name, "")
     model = str(user_config.get("model", ""))
-    base_url = str(user_config.get("base_url", ""))
     if provider_name != "ollama" and not user_config.get("cloud_authorized", False):
         raise ValueError("Confirm in AI settings that you have permission to use this cloud provider key.")
     if provider_name != "ollama" and not api_key:
-        raise ValueError("Add your API key in AI settings before using this provider.")
+        raise ValueError("AI assistance is not configured for this provider. You can still create and export resumes manually.")
     default_models = {
         "openai": "gpt-4o-mini",
         "anthropic": "claude-3-5-haiku-20241022",
@@ -112,13 +122,13 @@ def get_llm_provider(user_config: Any) -> LLMProvider:
         raise ValueError(f"Unsupported AI provider: {provider_name}")
     if provider_name in {"openai", "groq"}:
         default_url = "https://api.groq.com/openai/v1" if provider_name == "groq" else "https://api.openai.com/v1"
-        return provider_cls(api_key=api_key, base_url=base_url or default_url, model=model)
+        return provider_cls(api_key=api_key, base_url=default_url, model=model)
     if provider_name == "anthropic":
         return provider_cls(api_key=api_key, model=model)
     if provider_name == "google":
         return provider_cls(api_key=api_key, model=model)
     if provider_name == "ollama":
-        return provider_cls(base_url=base_url or "http://localhost:11434", model=model)
+        return provider_cls(base_url=settings.ollama_base_url, model=model or settings.ollama_model)
     if provider_name == "openrouter":
         return OpenRouterProvider(api_key=api_key, model=model)
     raise ValueError(f"Unsupported AI provider: {provider_name}")
